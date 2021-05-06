@@ -9,7 +9,8 @@ MainComponent::MainComponent()
 {
     // Make sure you set the size of the component after
     // you add any child components.
-    setSize(1400, 600);
+    juce::Rectangle<int> r = juce::Desktop::getInstance().getDisplays().getMainDisplay().userArea;
+    centreWithSize(r.getWidth() - 100, 600);
 
     alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "Hola!", "Vas a hacer un test mushra", "Adelante!");
 
@@ -145,7 +146,6 @@ MainComponent::MainComponent()
     if (deviceName == "MOTU")
         deviceManager.setCurrentAudioDeviceType("ASIO", true);
     */
-    //audioSetupComp.setBounds(0, 0, dW, dH);
     
     // Some platforms require permissions to open input channels so request that here
     if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio)
@@ -230,12 +230,12 @@ void MainComponent::paint (juce::Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (juce::Colours::lightgrey);
     g.setColour(juce::Colours::grey);
-    g.fillRect(1000, 0, 400, getHeight());
+    g.fillRect(getWidth()-400, 0, 400, getHeight());
     
-    audioSetupComp.setBounds(1000, 0, 400, getHeight());
+    audioSetupComp.setBounds(getWidth() - 400, 0, 400, getHeight());
 
     // You can add your drawing code here!
-    float w = 1000;
+    float w = getWidth() - 400;
     float h = getHeight();
     float width = (w - 20) / 10;
 
@@ -262,8 +262,8 @@ void MainComponent::paint (juce::Graphics& g)
         g.drawLine(70 , 210 + 56 * i, w - 80, 210 + 56 * i);
     }
 
-    stop.setBounds(1030 - width, 100, 60, 30);
-    bRef.setBounds(1030 - width, 145, width - 40, 50);
+    stop.setBounds(w + 30 - width, 100, 60, 30);
+    bRef.setBounds(w + 30 - width, 145, width - 40, 50);
     nextButton.setBounds(w - 110, h - 60, 100, 50);
 }
 
@@ -465,7 +465,7 @@ void MainComponent::dataExport()
         juce::File newFile(folderChooser.getResult());
         newFile.appendText(xmlString);
 
-        alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "MUCHAS GRACIAS!", "", "");
+        alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "MUCHAS GRACIAS!", "", "Salir");
 
         juce::JUCEApplicationBase::quit();
     };
