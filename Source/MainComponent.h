@@ -54,7 +54,6 @@ public:
         if (!isAddingFromMidiInput)
         {
             arrayButtons[midiNoteNumber/3-1]->setToggleState(true, juce::sendNotification);
-            
         }
     };
     
@@ -62,8 +61,9 @@ public:
 
     void midiMove(float noteNumber, int velocity)
     {
-        float div = 100.0 / 128.0;
-        arraySliders[noteNumber-1]->setValue(velocity * div);
+        //float div = 100.0 / 128.0;
+        float div = 0.78125;
+        arraySliders.getUnchecked(noteNumber-1)->setValue(velocity * div);
     };
 
     void midiButton(float noteNumber) {};
@@ -97,9 +97,9 @@ private:
     juce::Array<juce::TextButton*> arrayButtons;
 
     std::string perceptions[5] = {"Excelente", "Bueno", "Igual", "Pobre", "Malo"};
-    std::string buttonText[8] = { "A", "B", "C", "D", "E", "F", "G", "H" };
-    std::string names[6] = { "ref", "anch", "ao1", "ao2", "swf0", "swf1" };
-    int random[6] = { 0, 1, 2, 3, 4, 5 };
+    std::string buttonText[8] = { "1", "2", "3", "4", "5", "6", "7", "8" };
+    std::string names[8] = { "ref", "anch", "s1", "s2", "s3", "s4", "s5", "s6" };
+    int random[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
     juce::Array<juce::Colour> colours{ juce::Colours::red, juce::Colours::blue, juce::Colours::blueviolet, juce::Colours::aquamarine,
                                        juce::Colours::azure, juce::Colours::blanchedalmond, juce::Colours::indigo, juce::Colours::gold};
 
@@ -110,7 +110,7 @@ private:
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
 	
-	juce::Array<juce::AudioSampleBuffer> buffersArray[7];
+    juce::AudioSampleBuffer buffersArray[7];
     juce::MemoryInputStream* wavs[8];
 
     juce::MidiKeyboardState keyboardState;

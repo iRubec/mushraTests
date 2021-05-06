@@ -12,10 +12,12 @@ MainComponent::MainComponent()
     juce::Rectangle<int> r = juce::Desktop::getInstance().getDisplays().getMainDisplay().userArea;
     centreWithSize(r.getWidth() - 100, 600);
 
+    // Welcome message
     alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "Hola!", "Vas a hacer un test mushra", "Adelante!");
 
+    // Reading the info of the test to do
     readJSON();
-    
+
     int width = getWidth() - 400;
     float sliderWidth = (width - 20) / 10;
 
@@ -24,7 +26,7 @@ MainComponent::MainComponent()
         juce::Slider* s = new juce::Slider;
         s->setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
         s->setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 60, 20);
-        s->setBounds(40 + sliderWidth * (i+1), 200, sliderWidth, getHeight() - 280);
+        s->setBounds(40 + sliderWidth * (i+1), 200, sliderWidth, 322);
         s->setColour(0x1001400, juce::Colours::black);
         s->setColour(0x1001300, colours[i]);
         s->setRange(0, 100);
@@ -69,7 +71,7 @@ MainComponent::MainComponent()
     // Create the random array to load the files
 
     for (int i = 0; i < stimulis; i++) {
-        auto randomInt = juce::Random::getSystemRandom().nextInt(6);
+        auto randomInt = juce::Random::getSystemRandom().nextInt(stimulis);
         int tmp = random[i];
         random[i] = random[randomInt];
         random[randomInt] = tmp;
@@ -84,7 +86,7 @@ MainComponent::MainComponent()
     newBuffer.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
     reader->read(&newBuffer, 0, (int)reader->lengthInSamples, 0, true, true);
 
-    buffersArray->add(newBuffer);
+    buffersArray[0] = newBuffer;
     duration = reader->lengthInSamples / reader->sampleRate;
     
     for (int i = 0; i < stimulis; i++) {
@@ -97,7 +99,7 @@ MainComponent::MainComponent()
 		newBuffer.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
 		reader->read(&newBuffer, 0, (int)reader->lengthInSamples, 0, true, true);
 		
-		buffersArray->add(newBuffer);
+		buffersArray[i+1] = newBuffer;
 	};
     
     //==============================================================================
@@ -195,20 +197,22 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
 
     if (isPlaying)
     {
-        juce::AudioSampleBuffer stimuli = buffersArray->getUnchecked(buffer);
+        //juce::AudioSampleBuffer fileBuffer = buffersArray->getUnchecked(buffer);
+        //juce::AudioSampleBuffer fileBuffer = buf[buffer];
+
         auto outputSamplesOffset = bufferToFill.startSample;
         auto outputSamplesRemaining = bufferToFill.numSamples;
-        auto bufferSamplesRemaining = stimuli.getNumSamples() - position;
+        auto bufferSamplesRemaining = buffersArray[buffer].getNumSamples() - position;
         auto samplesThisTime = juce::jmin(outputSamplesRemaining, bufferSamplesRemaining);
 
         for (int ch = 0; ch < 24; ++ch)
-            bufferToFill.buffer->addFrom(ch, outputSamplesOffset, stimuli, ch, position, samplesThisTime, 0.5);
-
+            bufferToFill.buffer->addFrom(ch, outputSamplesOffset, buffersArray[buffer], ch, position, samplesThisTime, 0.5);
+        
         outputSamplesRemaining -= samplesThisTime;
         outputSamplesOffset += samplesThisTime;
         position += samplesThisTime;
 
-        if (position >= stimuli.getNumSamples())
+        if (position == buffersArray[buffer].getNumSamples())
             position = 0;
         
     };
@@ -238,7 +242,7 @@ void MainComponent::paint (juce::Graphics& g)
     float w = getWidth() - 400;
     float h = getHeight();
     float width = (w - 20) / 10;
-
+    /*
     juce::Rectangle<int> thumbnailBounds(150, 100, w - 250, 30);
     g.setColour(juce::Colours::white);
     g.fillRect(thumbnailBounds);
@@ -247,7 +251,7 @@ void MainComponent::paint (juce::Graphics& g)
     //thumbnail.drawChannels(g, thumbnailBounds, 0.0, thumbnail.getTotalLength(), 1.0f);
     g.setColour(juce::Colours::black);
     g.drawLine(150 + posPlayer, 100, 150 + posPlayer, 130, 1.0f);
-    
+    */
     g.setColour(juce::Colours::black);
     g.setFont(18.0f);
     g.drawText(testText, 10, 10, 60, 20, juce::Justification::left, false);
@@ -281,7 +285,7 @@ void MainComponent::buttonClicked(juce::Button* button)
     juce::String name = button->getName();
 
     if (name == "stop") { isPlaying = false; position = 0; posPlayer = 0; stopTimer(); }
-    else { isPlaying = true; startTimer(20); };
+    else { isPlaying = true; /*startTimer(20);*/ };
 
     if (name == "next")
     {
@@ -294,14 +298,14 @@ void MainComponent::buttonClicked(juce::Button* button)
         repaint();
     }
     else if (name == "ref"){ buffer = 0; }
-    else if (name == "A") { buffer = 1; }
-    else if (name == "B") { buffer = 2; }
-    else if (name == "C"){ buffer = 3; }
-    else if (name == "D"){ buffer = 4; }
-    else if (name == "E"){ buffer = 5;}
-    else if (name == "F"){ buffer = 6; }
-    else if (name == "G") { buffer = 7; }
-    else if (name == "H") { buffer = 8; }
+    else if (name == "1") { buffer = 1; }
+    else if (name == "2") { buffer = 2; }
+    else if (name == "3"){ buffer = 3; }
+    else if (name == "4"){ buffer = 4; }
+    else if (name == "5"){ buffer = 5;}
+    else if (name == "6"){ buffer = 6; }
+    else if (name == "7") { buffer = 7; }
+    else if (name == "8") { buffer = 8; }
 
     for (int i = 0; i < stimulis; i++)
     {
@@ -340,7 +344,6 @@ void MainComponent::handleTests()
         random[randomInt] = tmp;
     };
 
-    buffersArray->clear();
     juce::WavAudioFormat wavFormat;
 
     juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g" + juce::String(test + 1) + "/" + files[test][0]).getFullPathName());
@@ -351,7 +354,7 @@ void MainComponent::handleTests()
     newBuffer.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
     reader->read(&newBuffer, 0, (int)reader->lengthInSamples, 0, true, true);
 
-    buffersArray->add(newBuffer);
+    buffersArray[0] = newBuffer;
     duration = reader->lengthInSamples / reader->sampleRate;
 
     for (int i = 0; i < stimulis; i++) {
@@ -364,7 +367,7 @@ void MainComponent::handleTests()
         newBuffer.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
         reader->read(&newBuffer, 0, (int)reader->lengthInSamples, 0, true, true);
 
-        buffersArray->add(newBuffer);
+        buffersArray[i + 1] = newBuffer;
     };
 
 }
@@ -493,66 +496,82 @@ void MainComponent::readJSON()
 
         files[0][0] = parsedJson["FileNames"]["g1"]["ref"];
         files[0][1] = parsedJson["FileNames"]["g1"]["anchor"];
-        files[0][2] = parsedJson["FileNames"]["g1"]["ambi1"];
-        files[0][3] = parsedJson["FileNames"]["g1"]["ambi3"];
-        files[0][4] = parsedJson["FileNames"]["g1"]["swf0"];
-        files[0][5] = parsedJson["FileNames"]["g1"]["swf1"];
+        files[0][2] = parsedJson["FileNames"]["g1"]["s1"];
+        files[0][3] = parsedJson["FileNames"]["g1"]["s2"];
+        files[0][4] = parsedJson["FileNames"]["g1"]["s3"];
+        files[0][5] = parsedJson["FileNames"]["g1"]["s4"];
+        files[0][6] = parsedJson["FileNames"]["g1"]["s5"];
+        files[0][7] = parsedJson["FileNames"]["g1"]["s6"];
 
         if (groups >= 2) {
             files[1][0] = parsedJson["FileNames"]["g2"]["ref"];
             files[1][1] = parsedJson["FileNames"]["g2"]["anchor"];
-            files[1][2] = parsedJson["FileNames"]["g2"]["ambi1"];
-            files[1][3] = parsedJson["FileNames"]["g2"]["ambi3"];
-            files[1][4] = parsedJson["FileNames"]["g2"]["swf0"];
-            files[1][5] = parsedJson["FileNames"]["g2"]["swf1"];
+            files[1][2] = parsedJson["FileNames"]["g2"]["s1"];
+            files[1][3] = parsedJson["FileNames"]["g2"]["s2"];
+            files[1][4] = parsedJson["FileNames"]["g2"]["s3"];
+            files[1][5] = parsedJson["FileNames"]["g2"]["s4"];
+            files[1][6] = parsedJson["FileNames"]["g2"]["s5"];
+            files[1][7] = parsedJson["FileNames"]["g2"]["s6"];
         }
         if (groups >= 3) {
             files[2][0] = parsedJson["FileNames"]["g3"]["ref"];
             files[2][1] = parsedJson["FileNames"]["g3"]["anchor"];
-            files[2][2] = parsedJson["FileNames"]["g3"]["ambi1"];
-            files[2][3] = parsedJson["FileNames"]["g3"]["ambi3"];
-            files[2][4] = parsedJson["FileNames"]["g3"]["swf0"];
-            files[2][5] = parsedJson["FileNames"]["g3"]["swf1"];
+            files[2][2] = parsedJson["FileNames"]["g3"]["s1"];
+            files[2][3] = parsedJson["FileNames"]["g3"]["s2"];
+            files[2][4] = parsedJson["FileNames"]["g3"]["s3"];
+            files[2][5] = parsedJson["FileNames"]["g3"]["s4"];
+            files[2][6] = parsedJson["FileNames"]["g3"]["s5"];
+            files[2][7] = parsedJson["FileNames"]["g3"]["s6"];
         }
         if (groups >= 4) {
             files[3][0] = parsedJson["FileNames"]["g4"]["ref"];
             files[3][1] = parsedJson["FileNames"]["g4"]["anchor"];
-            files[3][2] = parsedJson["FileNames"]["g4"]["ambi1"];
-            files[3][3] = parsedJson["FileNames"]["g4"]["ambi3"];
-            files[3][4] = parsedJson["FileNames"]["g4"]["swf0"];
-            files[3][5] = parsedJson["FileNames"]["g4"]["swf1"];
+            files[3][2] = parsedJson["FileNames"]["g4"]["s1"];
+            files[3][3] = parsedJson["FileNames"]["g4"]["s2"];
+            files[3][4] = parsedJson["FileNames"]["g4"]["s3"];
+            files[3][5] = parsedJson["FileNames"]["g4"]["s4"];
+            files[3][6] = parsedJson["FileNames"]["g4"]["s5"];
+            files[3][7] = parsedJson["FileNames"]["g4"]["s6"];
         }
         if (groups >= 5) {
             files[4][0] = parsedJson["FileNames"]["g5"]["ref"];
             files[4][1] = parsedJson["FileNames"]["g5"]["anchor"];
-            files[4][2] = parsedJson["FileNames"]["g5"]["ambi1"];
-            files[4][3] = parsedJson["FileNames"]["g5"]["ambi3"];
-            files[4][4] = parsedJson["FileNames"]["g5"]["swf0"];
-            files[4][5] = parsedJson["FileNames"]["g5"]["swf1"];
+            files[4][2] = parsedJson["FileNames"]["g5"]["s1"];
+            files[4][3] = parsedJson["FileNames"]["g5"]["s2"];
+            files[4][4] = parsedJson["FileNames"]["g5"]["s3"];
+            files[4][5] = parsedJson["FileNames"]["g5"]["s4"];
+            files[4][6] = parsedJson["FileNames"]["g5"]["s5"];
+            files[4][7] = parsedJson["FileNames"]["g5"]["s6"];
         }
         if (groups >= 6) {
             files[5][0] = parsedJson["FileNames"]["g6"]["ref"];
             files[5][1] = parsedJson["FileNames"]["g6"]["anchor"];
-            files[5][2] = parsedJson["FileNames"]["g6"]["ambi1"];
-            files[5][3] = parsedJson["FileNames"]["g6"]["ambi3"];
-            files[5][4] = parsedJson["FileNames"]["g6"]["swf0"];
-            files[5][5] = parsedJson["FileNames"]["g6"]["swf1"];
+            files[5][2] = parsedJson["FileNames"]["g6"]["s1"];
+            files[5][3] = parsedJson["FileNames"]["g6"]["s2"];
+            files[5][4] = parsedJson["FileNames"]["g6"]["s3"];
+            files[5][5] = parsedJson["FileNames"]["g6"]["s4"];
+            files[5][6] = parsedJson["FileNames"]["g6"]["s5"];
+            files[5][7] = parsedJson["FileNames"]["g6"]["s6"];
         }
         if (groups >= 7) {
             files[6][0] = parsedJson["FileNames"]["g7"]["ref"];
             files[6][1] = parsedJson["FileNames"]["g7"]["anchor"];
-            files[6][2] = parsedJson["FileNames"]["g7"]["ambi1"];
-            files[6][3] = parsedJson["FileNames"]["g7"]["ambi3"];
-            files[6][4] = parsedJson["FileNames"]["g7"]["swf0"];
-            files[6][5] = parsedJson["FileNames"]["g7"]["swf1"];
+            files[6][2] = parsedJson["FileNames"]["g7"]["s1"];
+            files[6][3] = parsedJson["FileNames"]["g7"]["s2"];
+            files[6][4] = parsedJson["FileNames"]["g7"]["s3"];
+            files[6][5] = parsedJson["FileNames"]["g7"]["s4"];
+            files[6][6] = parsedJson["FileNames"]["g7"]["s5"];
+            files[6][7] = parsedJson["FileNames"]["g7"]["s6"];
         }
         if (groups >= 8) {
             files[7][0] = parsedJson["FileNames"]["g8"]["ref"];
             files[7][1] = parsedJson["FileNames"]["g8"]["anchor"];
-            files[7][2] = parsedJson["FileNames"]["g8"]["ambi1"];
-            files[7][3] = parsedJson["FileNames"]["g8"]["ambi3"];
-            files[7][4] = parsedJson["FileNames"]["g8"]["swf0"];
-            files[7][5] = parsedJson["FileNames"]["g8"]["swf1"];
+            files[7][2] = parsedJson["FileNames"]["g8"]["s1"];
+            files[7][3] = parsedJson["FileNames"]["g8"]["s2"];
+            files[7][4] = parsedJson["FileNames"]["g8"]["s3"];
+            files[7][5] = parsedJson["FileNames"]["g8"]["s4"];
+            files[7][6] = parsedJson["FileNames"]["g8"]["s5"];
+            files[7][7] = parsedJson["FileNames"]["g8"]["s6"];
         };
     };
 }
