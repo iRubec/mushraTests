@@ -49,24 +49,30 @@ public:
 
     };
 
-    void handleNoteOn(juce::MidiKeyboardState*, int midiChannel, int midiNoteNumber, float velocity) override
-    {
-        if (!isAddingFromMidiInput)
-        {
-            arrayButtons[midiNoteNumber/3-1]->setToggleState(true, juce::sendNotification);
-        }
-    };
+    void handleNoteOn(juce::MidiKeyboardState*, int midiChannel, int midiNoteNumber, float velocity) override {};
     
     void handleNoteOff(juce::MidiKeyboardState*, int midiChannel, int midiNoteNumber, float /*velocity*/) override {};
 
     void midiMove(float noteNumber, int velocity)
     {
         //float div = 100.0 / 128.0;
-        float div = 0.78125;
-        arraySliders.getUnchecked(noteNumber-1)->setValue(velocity * div);
+        //float div = 0.78125;
+        float div = 0.787402;
+        if(arraySliders.getUnchecked(sliderPositions[noteNumber])->isEnabled())
+            arraySliders.getUnchecked(sliderPositions[noteNumber])->setValue(round(velocity * div));
     };
 
-    void midiButton(float noteNumber) {};
+    void midiButton(float noteNumber)
+    {
+        if (noteNumber / 3 - 1 < stimulis)
+            arrayButtons[noteNumber / 3 - 1]->triggerClick();
+        else if (noteNumber == 27)
+            bRef.triggerClick();
+        else if (noteNumber == 26)
+            stop.triggerClick();
+        else if (noteNumber == 25)
+            nextButton.triggerClick();
+    };
     
     //==============================================================================
     void handleTests();
@@ -84,8 +90,7 @@ private:
     //==============================================================================
     // Your private member variables go here...
     juce::AlertWindow* alert;
-    juce::Slider s1, s2, s3, s4, s5, s6;
-    juce::TextButton bRef, b1, b2, b3, b4, b5, b6, nextButton, stop;
+    juce::TextButton bRef, nextButton, stop;
     int test = 0;
 
     juce::String midiText = "MIDI not found";
@@ -95,6 +100,7 @@ private:
     juce::String path;
     juce::Array<juce::Slider*> arraySliders;
     juce::Array<juce::TextButton*> arrayButtons;
+    std::map<int, int> sliderPositions = { {19, 0,}, {23, 1,}, {27, 2,}, {31, 3,}, {49, 4,}, {53, 5,}, {57, 6,}, {61, 7,} };
 
     std::string perceptions[5] = {"Excelente", "Bueno", "Igual", "Pobre", "Malo"};
     std::string buttonText[8] = { "1", "2", "3", "4", "5", "6", "7", "8" };
