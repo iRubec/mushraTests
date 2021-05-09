@@ -205,7 +205,7 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
         auto bufferSamplesRemaining = buffersArray[buffer].getNumSamples() - position;
         auto samplesThisTime = juce::jmin(outputSamplesRemaining, bufferSamplesRemaining);
 
-        for (int ch = 0; ch < 2; ++ch)
+        for (int ch = 0; ch < 24; ++ch)
             bufferToFill.buffer->addFrom(ch, outputSamplesOffset, buffersArray[buffer], ch, position, samplesThisTime, 0.5);
         
         outputSamplesRemaining -= samplesThisTime;
