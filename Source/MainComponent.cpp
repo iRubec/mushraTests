@@ -10,10 +10,17 @@ MainComponent::MainComponent()
     // Make sure you set the size of the component after
     // you add any child components.
     juce::Rectangle<int> r = juce::Desktop::getInstance().getDisplays().getMainDisplay().userArea;
-    centreWithSize(r.getWidth() - 100, 600);
+    //juce::Rectangle<int> r(0, 0, 1280, 1024);
+
+    int marginY = 100;
+    if (r.getHeight() >= 980) {
+        marginY = 300; marginButtons = 0;
+    };
+    
+    centreWithSize(r.getWidth() - 100, r.getHeight()- marginY);
 
     // Welcome message
-    alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "Hola!", "Vas a hacer un test mushra", "Adelante!");
+    alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "Hola!", welcome, "Adelante!");
 
     // Reading the info of the test to do
     readJSON();
@@ -26,14 +33,14 @@ MainComponent::MainComponent()
         juce::Slider* s = new juce::Slider;
         s->setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
         s->setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 60, 20);
-        s->setBounds(40 + sliderWidth * (i+1), 200, sliderWidth, 322);
+        s->setBounds(40 + sliderWidth * (i+1), 300, sliderWidth, 322);
         s->setColour(0x1001400, juce::Colours::black);
-        s->setColour(0x1001300, colours[i]);
+        s->setColour(0x1001300, juce::Colours::grey);
         s->setRange(0, 100);
         s->setNumDecimalPlacesToDisplay(0);
         s->setEnabled(false);
-        if (i <= stimulis) { s->setAlpha(0.6f); }
-        else { s->setAlpha(0.4f); s->setColour(0x1001300, juce::Colours::grey); };
+        if (i < stimulis) { s->setAlpha(0.6f); }
+        else { s->setAlpha(0.3f); };
         arraySliders.add(s);
         addAndMakeVisible(s);
 
@@ -41,7 +48,7 @@ MainComponent::MainComponent()
         newBut->setButtonText(buttonText[i]);
         newBut->setName(buttonText[i]);
         newBut->addListener(this);
-        newBut->setBounds(70 + sliderWidth * (i + 1), 150, sliderWidth - 60, 40);
+        newBut->setBounds(70 + sliderWidth * (i + 1) - 10, 250, sliderWidth - 40, 40);
         newBut->setColour(0x1000100, juce::Colours::black);
         if (i >= stimulis) { newBut->setAlpha(0.4f); newBut->setEnabled(false); };
         arrayButtons.add(newBut);
@@ -59,7 +66,7 @@ MainComponent::MainComponent()
     bRef.addListener(this);
     addAndMakeVisible(bRef);
 
-    nextButton.setButtonText("Siguiente >");
+    nextButton.setButtonText(">");
     nextButton.setName("next");
     nextButton.addListener(this);
     addAndMakeVisible(nextButton);
@@ -68,6 +75,16 @@ MainComponent::MainComponent()
     formatManager.registerBasicFormats();
 	juce::WavAudioFormat wavFormat;
     
+    // Printing the images
+    int upnaSize, upfSize;
+    juce::String upna = "upna_png", upf = "upf_png";
+    // UPNA
+    auto* upnaData = BinaryData::getNamedResource(upna.toUTF8(), upnaSize);
+    upnaImage = juce::ImageFileFormat::loadFrom(upnaData, upnaSize);
+    // UPF
+    auto* upfData = BinaryData::getNamedResource(upf.toUTF8(), upfSize);
+    upfImage = juce::ImageFileFormat::loadFrom(upfData, upfSize);
+
     // Create the random array to load the files
 
     for (int i = 0; i < stimulis; i++) {
@@ -122,32 +139,6 @@ MainComponent::MainComponent()
         }
 
     }
-
-    //==============================================================================
-    //=========================== TARJETA DE SONIDO ================================
-    //==============================================================================
-    addAndMakeVisible(audioSetupComp);
-
-    auto* device = deviceManager.getCurrentDeviceTypeObject();
-    //deviceManager.initialise(0, 2, nullptr, true, {}, nullptr);
-    //deviceManager.initialiseWithDefaultDevices(0, 24);
-    //deviceManager.setAudioDeviceSetup()
-
-    //juce::AudioDeviceManager* dev = deviceManager.getCurrentDeviceTypeObject()->getTypeName();
-    
-    /*
-    // Leemos la tarjeta da sonido que se está usando y se la pasamos al header
-    // para que la saque por pantalla
-    // deviceManager.getAudioDeviceSetup();
-    auto* device = deviceManager.getCurrentAudioDevice();
-    juce::String deviceName = device->getName();
-    auto activeOutputChannels = device->getActiveOutputChannels();
-    int avaiableOutputs = activeOutputChannels.countNumberOfSetBits();
-
-    // Le dcimos que use los drivers ASIO para la salida de audio
-    if (deviceName == "MOTU")
-        deviceManager.setCurrentAudioDeviceType("ASIO", true);
-    */
     
     // Some platforms require permissions to open input channels so request that here
     if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio)
@@ -161,6 +152,31 @@ MainComponent::MainComponent()
         // Specify the number of input and output channels that we want to open
         setAudioChannels (0, 24);
     }
+
+    //==============================================================================
+    //=========================== TARJETA DE SONIDO ================================
+    //==============================================================================
+    addAndMakeVisible(audioSetupComp);
+
+    // Leemos la tarjeta da sonido que se está usando y se la pasamos al header
+    // para que la saque por pantalla
+    deviceManager.getAudioDeviceSetup();
+    auto* device = deviceManager.getCurrentAudioDevice();
+    //juce::String deviceName = device->getName();
+    auto activeOutputChannels = device->getActiveOutputChannels();
+    avaiableOutputs = activeOutputChannels.countNumberOfSetBits();
+
+    if (avaiableOutputs < 24)
+        avaiableOutputs = 2;
+    else if (avaiableOutputs == 24)
+        avaiableOutputs = 24;
+
+    /*
+    // Le dcimos que use los drivers ASIO para la salida de audio
+    if (deviceName == "MOTU")
+        deviceManager.setCurrentAudioDeviceType("ASIO", true);
+    */
+
 }
 
 MainComponent::~MainComponent()
@@ -197,15 +213,12 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
 
     if (isPlaying)
     {
-        //juce::AudioSampleBuffer fileBuffer = buffersArray->getUnchecked(buffer);
-        //juce::AudioSampleBuffer fileBuffer = buf[buffer];
-
         auto outputSamplesOffset = bufferToFill.startSample;
         auto outputSamplesRemaining = bufferToFill.numSamples;
         auto bufferSamplesRemaining = buffersArray[buffer].getNumSamples() - position;
         auto samplesThisTime = juce::jmin(outputSamplesRemaining, bufferSamplesRemaining);
 
-        for (int ch = 0; ch < 24; ++ch)
+        for (int ch = 0; ch < avaiableOutputs; ++ch)
             bufferToFill.buffer->addFrom(ch, outputSamplesOffset, buffersArray[buffer], ch, position, samplesThisTime, 0.5);
         
         outputSamplesRemaining -= samplesThisTime;
@@ -258,17 +271,28 @@ void MainComponent::paint (juce::Graphics& g)
     g.setFont(10.0f);
     g.drawText(midiText, w - 150, 5, 140, 20, juce::Justification::right, false);
     
+    juce::Rectangle<int> textBounds(10, 40, w - 105, 200);
+    g.setColour(juce::Colours::grey);
+    g.fillRect(textBounds);
+    g.setColour(juce::Colours::white);
     g.setFont(18.0f);
+    g.drawMultiLineText(descriptionText, 15, 60, w - 110, juce::Justification::centredLeft);
+
+    g.setFont(18.0f);
+    g.setColour(juce::Colours::black);
     for (int i = 0; i < 6; i++)
     {
-        g.drawText(juce::String(100 - i*20), 20, 205 + 56 * i, 40, 10, juce::Justification::right, false);
-        if (i < 5) { g.drawText(perceptions[i], 70, 210 + 56 * i, width - 20, 56, juce::Justification::centred, false); }
-        g.drawLine(70 , 210 + 56 * i, w - 80, 210 + 56 * i);
+        g.drawText(juce::String(100 - i*20), 20, 305 + 56 * i, 40, 10, juce::Justification::right, false);
+        if (i < 5) { g.drawText(perceptions[i], 70, 310 + 56 * i, width - 20, 56, juce::Justification::centred, false); }
+        g.drawLine(70 , 310 + 56 * i, w - 80, 310 + 56 * i);
     }
+    
+    nextButton.setBounds(w + marginButtons - width, 80, 60, 40);
+    stop.setBounds(w + marginButtons - width, 125, 60, 30);
+    bRef.setBounds(w + marginButtons - width, 160, 60, 40);
 
-    stop.setBounds(w + 30 - width, 100, 60, 30);
-    bRef.setBounds(w + 30 - width, 145, width - 40, 50);
-    nextButton.setBounds(w - 110, h - 60, 100, 50);
+    g.drawImageWithin(upnaImage, 10, h - 80, 132, 70, juce::RectanglePlacement::stretchToFit);
+    g.drawImageWithin(upfImage, 160, h - 80, 202, 70, juce::RectanglePlacement::stretchToFit);
 }
 
 void MainComponent::resized()
@@ -310,6 +334,7 @@ void MainComponent::buttonClicked(juce::Button* button)
     for (int i = 0; i < stimulis; i++)
     {
         arraySliders[i]->setEnabled(false);
+        arraySliders[i]->setColour(0x1001300, juce::Colours::grey);
         arraySliders[i]->setAlpha(0.5f);
         arrayButtons[i]->setColour(0x1000100, juce::Colours::black);
         bRef.setColour(0x1000100, juce::Colours::black);
@@ -318,6 +343,7 @@ void MainComponent::buttonClicked(juce::Button* button)
     if (buffer != 0 && isPlaying)
     {
         arraySliders[buffer - 1]->setEnabled(true);
+        arraySliders[buffer - 1]->setColour(0x1001300, juce::Colours::lightgreen);
         arraySliders[buffer - 1]->setAlpha(1.0f);
         arrayButtons[buffer - 1]->setColour(0x1000100, juce::Colours::lightgreen);
         bRef.setColour(0x1000100, juce::Colours::black);
@@ -468,7 +494,7 @@ void MainComponent::dataExport()
         juce::File newFile(folderChooser.getResult());
         newFile.appendText(xmlString);
 
-        alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "MUCHAS GRACIAS!", "", "Salir");
+        alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, goodBye, "", "Salir");
 
         juce::JUCEApplicationBase::quit();
     };
@@ -575,19 +601,3 @@ void MainComponent::readJSON()
         };
     };
 }
-
-/*
-juce::Slider createSlider(juce::String name, juce::Rectangle<int> pos)
-{
-    juce::Slider newSlider;
-    newSlider.setBounds(pos);
-    newSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
-    newSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
-    newSlider.setColour(0x1001400, juce::Colours::black);
-    newSlider.setRange(0, 100);
-    newSlider.setNumDecimalPlacesToDisplay(0);
-
-    return newSlider;
-
-}
-*/

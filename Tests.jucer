@@ -4,6 +4,11 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="CibwBh" name="Tests">
     <GROUP id="{EF19E173-3C11-4E9B-7969-E41D3245B512}" name="Source">
+      <GROUP id="{04474126-35A2-337B-11A4-8A9E8DC62239}" name="images">
+        <FILE id="frlsny" name="owl_front.png" compile="0" resource="1" file="Source/images/owl_front.png"/>
+        <FILE id="R3ZquZ" name="upf.png" compile="0" resource="1" file="Source/images/upf.png"/>
+        <FILE id="PfBOBT" name="upna.png" compile="0" resource="1" file="Source/images/upna.png"/>
+      </GROUP>
       <FILE id="dcY8XD" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="sTNbIr" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="LC5DtM" name="MainComponent.cpp" compile="1" resource="0"
@@ -12,7 +17,7 @@
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_ASIO="1"/>
   <EXPORTFORMATS>
-    <VS2019 targetFolder="Builds/VisualStudio2019">
+    <VS2019 targetFolder="Builds/VisualStudio2019" smallIcon="frlsny" bigIcon="frlsny">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="Tests" headerPath="C:\Program Files (x86)\Microsoft Visual Studio\asiosdk\common"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="Tests" headerPath="C:\Program Files (x86)\Microsoft Visual Studio\asiosdk\common"/>

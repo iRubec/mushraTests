@@ -20,6 +20,7 @@
     	{
     	 "ref": "g2_ref.wav",
     	 "anchor":"g2_anchor.wav",
+    	 "s1": "g2_ambi_o1.wav",
     	 "s2": "g2_ambi_o1.wav",
     	 "s3": "g2_ambi_o3.wav",
     	 "s4": "g2_SWF_0.wav",

@@ -91,7 +91,7 @@ private:
     // Your private member variables go here...
     juce::AlertWindow* alert;
     juce::TextButton bRef, nextButton, stop;
-    int test = 0;
+    int test = 0, avaiableOutputs = 0, marginButtons = 20;
 
     juce::String midiText = "MIDI not found";
     juce::String testText = "Test 1";
@@ -105,10 +105,20 @@ private:
     std::string perceptions[5] = {"Excelente", "Bueno", "Igual", "Pobre", "Malo"};
     std::string buttonText[8] = { "1", "2", "3", "4", "5", "6", "7", "8" };
     std::string names[8] = { "ref", "anch", "s1", "s2", "s3", "s4", "s5", "s6" };
+    std::string descriptionText = "Esta es la primera linea de la descripcion del test.\n\
+Ahora va la segunda, que es lo que ha pedido Ricardo y yo soy un mandado.\n\
+ 1. Excelente: \n\
+ 2. Bueno: \n\
+ 3. Igual: \n\
+ 4. Peor: \n\
+ 5. Terrible: \n\
+Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que seguro que alguna pega le saca";
+    std::string welcome = "Vas a hacer un test mushra";
+    std::string goodBye = "MUCHAS GRACIAS!";
     int random[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-    juce::Array<juce::Colour> colours{ juce::Colours::red, juce::Colours::blue, juce::Colours::blueviolet, juce::Colours::aquamarine,
-                                       juce::Colours::azure, juce::Colours::blanchedalmond, juce::Colours::indigo, juce::Colours::gold};
 
+    juce::Image upnaImage, upfImage;
+ 
     juce::XmlElement* testData = new juce::XmlElement("testData");
     juce::String files[8][6];
 
