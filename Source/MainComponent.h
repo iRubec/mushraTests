@@ -94,11 +94,11 @@ private:
     // Your private member variables go here...
     juce::AlertWindow* alert;
     juce::TextButton bRef, nextButton, stop;
-    int test = 0, avaiableOutputs = 0, marginButtons = 20;
+    int test = 0, avaiableOutputs = 0, marginButtons = 20, channels = 2;
 
     juce::String midiText = "MIDI not found";
     juce::String testText = "Test 1";
-    int testNumber = 1, stimulis = 0, groups = 0;
+    int testNumber = 1, stimuli = 0, groups = 0;
     float duration, posPlayer = 0.0;
     juce::String path;
     juce::Array<juce::Slider*> arraySliders;
@@ -148,7 +148,7 @@ Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que se
     int expectedSamplesPerBlock = 0;
     int position = 0;
     int buffer = 0;
-    bool isPlaying = false;
+    bool isPlaying = false, ch = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

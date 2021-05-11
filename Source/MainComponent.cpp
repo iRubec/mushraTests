@@ -5,10 +5,8 @@ MainComponent::MainComponent()
     : keyboardComponent(keyboardState, juce::MidiKeyboardComponent::horizontalKeyboard),
     audioSetupComp(deviceManager, 0, 24, 0,  24, false, false, false, true),
     thumbnailCache(5), thumbnail(512, formatManager, thumbnailCache)
-    //startTime(juce::Time::getMillisecondCounterHiRes() * 0.001)
 {
-    // Make sure you set the size of the component after
-    // you add any child components.
+    // Taking the size of the screen
     juce::Rectangle<int> r = juce::Desktop::getInstance().getDisplays().getMainDisplay().userArea;
     //juce::Rectangle<int> r(0, 0, 1280, 1024);
 
@@ -46,7 +44,7 @@ MainComponent::MainComponent()
         s->setRange(0, 100);
         s->setNumDecimalPlacesToDisplay(0);
         s->setEnabled(false);
-        if (i < stimulis) { s->setAlpha(0.6f); }
+        if (i < stimuli) { s->setAlpha(0.6f); }
         else { s->setAlpha(0.3f); };
         arraySliders.add(s);
         addAndMakeVisible(s);
@@ -58,7 +56,7 @@ MainComponent::MainComponent()
         newBut->addListener(this);
         newBut->setBounds(70 + sliderWidth * (i + 1) - 10, 250, sliderWidth - 40, 40);
         newBut->setColour(0x1000100, juce::Colours::black);
-        if (i >= stimulis) { newBut->setAlpha(0.4f); newBut->setEnabled(false); };
+        if (i >= stimuli) { newBut->setAlpha(0.4f); newBut->setEnabled(false); };
         arrayButtons.add(newBut);
         addAndMakeVisible(newBut);
 
@@ -102,8 +100,8 @@ MainComponent::MainComponent()
     //================================ RANDOMIZER ==================================
     //==============================================================================
     // Create the random array to load the files
-    for (int i = 0; i < stimulis; i++) {
-        auto randomInt = juce::Random::getSystemRandom().nextInt(stimulis);
+    for (int i = 0; i < stimuli; i++) {
+        auto randomInt = juce::Random::getSystemRandom().nextInt(stimuli);
         int tmp = random[i];
         random[i] = random[randomInt];
         random[randomInt] = tmp;
@@ -129,7 +127,7 @@ MainComponent::MainComponent()
     duration = reader->lengthInSamples / reader->sampleRate;
     
     // Now reading the stimuli audios
-    for (int i = 0; i < stimulis; i++) {
+    for (int i = 0; i < stimuli; i++) {
        
         juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g1/" + files[0][random[i]]).getFullPathName());
         auto is = new juce::FileInputStream(file);
@@ -168,12 +166,12 @@ MainComponent::MainComponent()
         && ! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::recordAudio))
     {
         juce::RuntimePermissions::request (juce::RuntimePermissions::recordAudio,
-                                           [&] (bool granted) { setAudioChannels (granted ? 2 : 0, 24); });
+                                           [&] (bool granted) { setAudioChannels (granted ? 2 : 0, channels); });
     }
     else
     {
         // Specify the number of input and output channels that we want to open
-        setAudioChannels (0, 24);
+        setAudioChannels (0, channels);
     }
 
     //==============================================================================
@@ -206,11 +204,16 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double newSample
     auto activeOutputChannels = device->getActiveOutputChannels();
     avaiableOutputs = activeOutputChannels.countNumberOfSetBits();
 
-    if (avaiableOutputs < 24)
-        avaiableOutputs = 2;
-    else if (avaiableOutputs == 24)
-        avaiableOutputs = 24;
-
+    if (channels > avaiableOutputs)
+    {
+        ch = false;
+        std::string str = "Estás intentando reproducir archivos con más canales de los disponibles";
+        alert->showMessageBox(juce::AlertWindow::AlertIconType::WarningIcon, "Error", str, "OK");
+    }
+    else
+    {
+        ch = true;
+    };
 }
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
@@ -224,14 +227,14 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
 
     bufferToFill.clearActiveBufferRegion();
 
-    if (isPlaying)
+    if (isPlaying && ch)
     {
         auto outputSamplesOffset = bufferToFill.startSample;
         auto outputSamplesRemaining = bufferToFill.numSamples;
         auto bufferSamplesRemaining = buffersArray[buffer].getNumSamples() - position;
         auto samplesThisTime = juce::jmin(outputSamplesRemaining, bufferSamplesRemaining);
 
-        for (int ch = 0; ch < avaiableOutputs; ++ch)
+        for (int ch = 0; ch < channels; ++ch)
             bufferToFill.buffer->addFrom(ch, outputSamplesOffset, buffersArray[buffer], ch, position, samplesThisTime, 0.5);
         
         outputSamplesRemaining -= samplesThisTime;
@@ -345,7 +348,7 @@ void MainComponent::buttonClicked(juce::Button* button)
     else if (name == "7") { buffer = 7; }
     else if (name == "8") { buffer = 8; }
 
-    for (int i = 0; i < stimulis; i++)
+    for (int i = 0; i < stimuli; i++)
     {
         arraySliders[i]->setEnabled(false);
         arraySliders[i]->setColour(0x1001300, juce::Colours::grey);
@@ -377,8 +380,8 @@ void MainComponent::handleTests()
     test = test + 1;
 
     // Randomization
-    for (int i = 0; i < stimulis; i++) {
-        auto randomInt = juce::Random::getSystemRandom().nextInt(stimulis);
+    for (int i = 0; i < stimuli; i++) {
+        auto randomInt = juce::Random::getSystemRandom().nextInt(stimuli);
         int tmp = random[i];
         random[i] = random[randomInt];
         random[randomInt] = tmp;
@@ -397,7 +400,7 @@ void MainComponent::handleTests()
     buffersArray[0] = newBuffer;
     duration = reader->lengthInSamples / reader->sampleRate;
 
-    for (int i = 0; i < stimulis; i++) {
+    for (int i = 0; i < stimuli; i++) {
 
         juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g" + juce::String(test+1) + "/" + files[test][random[i]]).getFullPathName());
         auto is = new juce::FileInputStream(file);
@@ -426,7 +429,7 @@ void MainComponent::dataExport()
     a->addChildElement(aAns);
     testElement->addChildElement(a);
     
-    if (stimulis >= 2) {
+    if (stimuli >= 2) {
         juce::XmlElement* b = new juce::XmlElement("B");
         juce::XmlElement* bTech = new juce::XmlElement("tech");
         juce::XmlElement* bAns = new juce::XmlElement("ans");
@@ -436,7 +439,7 @@ void MainComponent::dataExport()
         b->addChildElement(bAns);
         testElement->addChildElement(b);
     }
-    if (stimulis >= 3) {
+    if (stimuli >= 3) {
         juce::XmlElement* c = new juce::XmlElement("C");
         juce::XmlElement* cTech = new juce::XmlElement("tech");
         juce::XmlElement* cAns = new juce::XmlElement("ans");
@@ -446,7 +449,7 @@ void MainComponent::dataExport()
         c->addChildElement(cAns);
         testElement->addChildElement(c);
     }
-    if (stimulis >= 4) {
+    if (stimuli >= 4) {
         juce::XmlElement* d = new juce::XmlElement("D");
         juce::XmlElement* dTech = new juce::XmlElement("tech");
         juce::XmlElement* dAns = new juce::XmlElement("ans");
@@ -456,7 +459,7 @@ void MainComponent::dataExport()
         d->addChildElement(dAns);
         testElement->addChildElement(d);
     }
-    if (stimulis >= 5) {
+    if (stimuli >= 5) {
         juce::XmlElement* e = new juce::XmlElement("E");
         juce::XmlElement* eTech = new juce::XmlElement("tech");
         juce::XmlElement* eAns = new juce::XmlElement("ans");
@@ -466,7 +469,7 @@ void MainComponent::dataExport()
         e->addChildElement(eAns);
         testElement->addChildElement(e);
     }
-    if (stimulis >= 6) {
+    if (stimuli >= 6) {
         juce::XmlElement* f = new juce::XmlElement("F");
         juce::XmlElement* fTech = new juce::XmlElement("tech");
         juce::XmlElement* fAns = new juce::XmlElement("ans");
@@ -476,7 +479,7 @@ void MainComponent::dataExport()
         f->addChildElement(fAns);
         testElement->addChildElement(f);
     }
-    if (stimulis >= 7) {
+    if (stimuli >= 7) {
         juce::XmlElement* g = new juce::XmlElement("G");
         juce::XmlElement* gTech = new juce::XmlElement("tech");
         juce::XmlElement* gAns = new juce::XmlElement("ans");
@@ -486,7 +489,7 @@ void MainComponent::dataExport()
         g->addChildElement(gAns);
         testElement->addChildElement(g);
     }
-    if (stimulis >= 8) {
+    if (stimuli >= 8) {
         juce::XmlElement* h = new juce::XmlElement("H");
         juce::XmlElement* hTech = new juce::XmlElement("tech");
         juce::XmlElement* hAns = new juce::XmlElement("ans");
@@ -523,7 +526,7 @@ void MainComponent::timerCallback()
 
 void MainComponent::readJSON()
 {
-    juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../filenames.json").getFullPathName());
+    juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../testDescription.json").getFullPathName());
     juce::var parsedJson = juce::JSON::parse(file);
     juce::String data = juce::JSON::toString(parsedJson);
 
@@ -532,7 +535,8 @@ void MainComponent::readJSON()
 
         path = parsedJson["Path"];
         groups = parsedJson["Groups"];
-        stimulis = parsedJson["StimuliPerGroup"];
+        stimuli = parsedJson["StimuliPerGroup"];
+        channels = parsedJson["Channels"];
 
         files[0][0] = parsedJson["FileNames"]["g1"]["ref"];
         files[0][1] = parsedJson["FileNames"]["g1"]["anchor"];
