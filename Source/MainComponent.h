@@ -4,6 +4,9 @@
 //using namespace std;
 //using namespace juce;
 
+#include <locale>
+#include <codecvt>
+
 //==============================================================================
 /*
     This component lives inside our window, and this is where you should put all
@@ -103,7 +106,7 @@ private:
     std::map<int, int> sliderPositions = { {19, 0,}, {23, 1,}, {27, 2,}, {31, 3,}, {49, 4,}, {53, 5,}, {57, 6,}, {61, 7,} };
     std::map<int, int> buttonPositions = { {1, 0,}, {4, 1,}, {7, 2,}, {10, 3,}, {13, 4,}, {16, 5,}, {19, 6,}, {22, 7,},  
                                          {3, 0,}, {6, 1,}, {9, 2,}, {12, 3,}, {15, 4,}, {18, 5,}, {21, 6,}, {24, 7,} };
-
+   
     // Textos!
     std::string perceptions[5] = {"Excelente", "Bueno", "Igual", "Pobre", "Malo"};
     std::string buttonText[8] = { "1", "2", "3", "4", "5", "6", "7", "8" };
@@ -124,13 +127,13 @@ Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que se
     juce::Image upnaImage, upfImage, jaulabImage;
  
     juce::XmlElement* testData = new juce::XmlElement("testData");
-    juce::String files[8][6];
+    juce::String files[8][8];
 
     juce::AudioDeviceSelectorComponent audioSetupComp;
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
 	
-    juce::AudioSampleBuffer buffersArray[8];
+    juce::AudioSampleBuffer buffersArray[9];
     juce::MemoryInputStream* wavs[8];
 
     juce::MidiKeyboardState keyboardState;

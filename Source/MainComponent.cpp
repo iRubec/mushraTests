@@ -378,7 +378,7 @@ void MainComponent::handleTests()
 
     // Randomization
     for (int i = 0; i < stimulis; i++) {
-        auto randomInt = juce::Random::getSystemRandom().nextInt(6);
+        auto randomInt = juce::Random::getSystemRandom().nextInt(stimulis);
         int tmp = random[i];
         random[i] = random[randomInt];
         random[randomInt] = tmp;
