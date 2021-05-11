@@ -17,19 +17,26 @@ MainComponent::MainComponent()
         marginY = 300; marginButtons = 0;
     };
     
+    // Setting the size of the window
     centreWithSize(r.getWidth() - 100, r.getHeight()- marginY);
 
-    // Welcome message
+    // Alert window with the welcome message
     alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "Hola!", welcome, "Adelante!");
 
     // Reading the info of the test to do
     readJSON();
 
+    //==============================================================================
+    //=========================== SLIDERS AND BUTTONS ==============================
+    //==============================================================================
+    // Variables to draw set the sliders and buttons size
     int width = getWidth() - 400;
     float sliderWidth = (width - 20) / 10;
 
+    // We will create 8 sliders with their buttons in the top. Only the number of stimuli will be enabled and more coloured
     for (int i = 0; i < 8; i++)
     {
+        // Slider
         juce::Slider* s = new juce::Slider;
         s->setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
         s->setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 60, 20);
@@ -44,6 +51,7 @@ MainComponent::MainComponent()
         arraySliders.add(s);
         addAndMakeVisible(s);
 
+        // Button
         juce::TextButton* newBut = new juce::TextButton;
         newBut->setButtonText(buttonText[i]);
         newBut->setName(buttonText[i]);
@@ -56,26 +64,28 @@ MainComponent::MainComponent()
 
     };
 
+    // Stop button
     stop.setButtonText("STOP");
     stop.setName("stop");
     stop.addListener(this);
     addAndMakeVisible(stop);
 
+    // Ref button
     bRef.setButtonText("REF");
     bRef.setName("ref");
     bRef.addListener(this);
     addAndMakeVisible(bRef);
 
+    // Next button
     nextButton.setButtonText(">");
     nextButton.setName("next");
     nextButton.addListener(this);
     addAndMakeVisible(nextButton);
-
-    // Reading the first group of audios
-    formatManager.registerBasicFormats();
-	juce::WavAudioFormat wavFormat;
     
-    // Printing the images
+    //==============================================================================
+    //================================== IMAGES ====================================
+    //==============================================================================
+    // Loading the images of the botttom part of the window
     int upnaSize, upfSize, jaulabSize;
     juce::String upna = "upna_png", upf = "upf_png", jaulab = "jaulab_png";
     // UPNA
@@ -88,14 +98,23 @@ MainComponent::MainComponent()
     auto* jaulabData = BinaryData::getNamedResource(jaulab.toUTF8(), jaulabSize);
     jaulabImage = juce::ImageFileFormat::loadFrom(jaulabData, jaulabSize);
 
+    //==============================================================================
+    //================================ RANDOMIZER ==================================
+    //==============================================================================
     // Create the random array to load the files
-
     for (int i = 0; i < stimulis; i++) {
         auto randomInt = juce::Random::getSystemRandom().nextInt(stimulis);
         int tmp = random[i];
         random[i] = random[randomInt];
         random[randomInt] = tmp;
     };
+
+    //==============================================================================
+    //================================== AUDIOS ====================================
+    //==============================================================================
+    // Reading the first group of audios
+    formatManager.registerBasicFormats();
+    juce::WavAudioFormat wavFormat;
 
     // Reference audio
     juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g1/" + files[0][0]).getFullPathName());
@@ -109,6 +128,7 @@ MainComponent::MainComponent()
     buffersArray[0] = newBuffer;
     duration = reader->lengthInSamples / reader->sampleRate;
     
+    // Now reading the stimuli audios
     for (int i = 0; i < stimulis; i++) {
        
         juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g1/" + files[0][random[i]]).getFullPathName());
