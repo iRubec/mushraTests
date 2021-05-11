@@ -14,7 +14,7 @@ MainComponent::MainComponent()
 
     int marginY = 100;
     if (r.getHeight() >= 980) {
-        marginY = 300; marginButtons = 0;
+        marginY = 250; marginButtons = 0;
     };
     
     // Setting the size of the window
