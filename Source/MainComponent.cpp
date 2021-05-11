@@ -21,7 +21,7 @@ MainComponent::MainComponent()
     centreWithSize(r.getWidth() - 100, r.getHeight()- marginY);
 
     // Alert window with the welcome message
-    alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "Hola!", welcome, "Adelante!");
+    alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, welcome, welcomeText, "Adelante!");
 
     // Reading the info of the test to do
     readJSON();

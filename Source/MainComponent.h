@@ -64,8 +64,8 @@ public:
 
     void midiButton(float noteNumber)
     {
-        if (noteNumber / 3 - 1 < stimulis)
-            arrayButtons[noteNumber / 3 - 1]->triggerClick();
+        if(noteNumber <= 24)
+            arrayButtons[buttonPositions[noteNumber]]->triggerClick();
         else if (noteNumber == 27)
             bRef.triggerClick();
         else if (noteNumber == 26)
@@ -101,7 +101,10 @@ private:
     juce::Array<juce::Slider*> arraySliders;
     juce::Array<juce::TextButton*> arrayButtons;
     std::map<int, int> sliderPositions = { {19, 0,}, {23, 1,}, {27, 2,}, {31, 3,}, {49, 4,}, {53, 5,}, {57, 6,}, {61, 7,} };
+    std::map<int, int> buttonPositions = { {1, 0,}, {4, 1,}, {7, 2,}, {10, 3,}, {13, 4,}, {16, 5,}, {19, 6,}, {22, 7,},  
+                                         {3, 0,}, {6, 1,}, {9, 2,}, {12, 3,}, {15, 4,}, {18, 5,}, {21, 6,}, {24, 7,} };
 
+    // Textos!
     std::string perceptions[5] = {"Excelente", "Bueno", "Igual", "Pobre", "Malo"};
     std::string buttonText[8] = { "1", "2", "3", "4", "5", "6", "7", "8" };
     std::string names[8] = { "ref", "anch", "s1", "s2", "s3", "s4", "s5", "s6" };
@@ -113,7 +116,8 @@ Ahora va la segunda, que es lo que ha pedido Ricardo y yo soy un mandado.\n\
  4. Peor: \n\
  5. Terrible: \n\
 Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que seguro que alguna pega le saca";
-    std::string welcome = "Vas a hacer un test mushra";
+    std::string welcome = "Hola!";
+    std::string welcomeText = "Vas a hacer un test mushra";
     std::string goodBye = "MUCHAS GRACIAS!";
     int random[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
 
