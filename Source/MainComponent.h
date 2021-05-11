@@ -130,7 +130,7 @@ Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que se
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
 	
-    juce::AudioSampleBuffer buffersArray[7];
+    juce::AudioSampleBuffer buffersArray[8];
     juce::MemoryInputStream* wavs[8];
 
     juce::MidiKeyboardState keyboardState;
