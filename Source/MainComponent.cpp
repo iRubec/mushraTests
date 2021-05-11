@@ -76,14 +76,17 @@ MainComponent::MainComponent()
 	juce::WavAudioFormat wavFormat;
     
     // Printing the images
-    int upnaSize, upfSize;
-    juce::String upna = "upna_png", upf = "upf_png";
+    int upnaSize, upfSize, jaulabSize;
+    juce::String upna = "upna_png", upf = "upf_png", jaulab = "jaulab_png";
     // UPNA
     auto* upnaData = BinaryData::getNamedResource(upna.toUTF8(), upnaSize);
     upnaImage = juce::ImageFileFormat::loadFrom(upnaData, upnaSize);
     // UPF
     auto* upfData = BinaryData::getNamedResource(upf.toUTF8(), upfSize);
     upfImage = juce::ImageFileFormat::loadFrom(upfData, upfSize);
+    // JAULAB
+    auto* jaulabData = BinaryData::getNamedResource(jaulab.toUTF8(), jaulabSize);
+    jaulabImage = juce::ImageFileFormat::loadFrom(jaulabData, jaulabSize);
 
     // Create the random array to load the files
 
@@ -154,28 +157,9 @@ MainComponent::MainComponent()
     }
 
     //==============================================================================
-    //=========================== TARJETA DE SONIDO ================================
+    //============================== audioSetupComp ================================
     //==============================================================================
     addAndMakeVisible(audioSetupComp);
-
-    // Leemos la tarjeta da sonido que se está usando y se la pasamos al header
-    // para que la saque por pantalla
-    deviceManager.getAudioDeviceSetup();
-    auto* device = deviceManager.getCurrentAudioDevice();
-    //juce::String deviceName = device->getName();
-    auto activeOutputChannels = device->getActiveOutputChannels();
-    avaiableOutputs = activeOutputChannels.countNumberOfSetBits();
-
-    if (avaiableOutputs < 24)
-        avaiableOutputs = 2;
-    else if (avaiableOutputs == 24)
-        avaiableOutputs = 24;
-
-    /*
-    // Le dcimos que use los drivers ASIO para la salida de audio
-    if (deviceName == "MOTU")
-        deviceManager.setCurrentAudioDeviceType("ASIO", true);
-    */
 
 }
 
@@ -197,6 +181,15 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double newSample
     // For more details, see the help for AudioProcessor::prepareToPlay()
     sampleRate = newSampleRate;
     expectedSamplesPerBlock = samplesPerBlockExpected;
+
+    auto* device = deviceManager.getCurrentAudioDevice();
+    auto activeOutputChannels = device->getActiveOutputChannels();
+    avaiableOutputs = activeOutputChannels.countNumberOfSetBits();
+
+    if (avaiableOutputs < 24)
+        avaiableOutputs = 2;
+    else if (avaiableOutputs == 24)
+        avaiableOutputs = 24;
 
 }
 
@@ -293,6 +286,7 @@ void MainComponent::paint (juce::Graphics& g)
 
     g.drawImageWithin(upnaImage, 10, h - 80, 132, 70, juce::RectanglePlacement::stretchToFit);
     g.drawImageWithin(upfImage, 160, h - 80, 202, 70, juce::RectanglePlacement::stretchToFit);
+    g.drawImageWithin(jaulabImage, w - 169, h - 80, 159, 70, juce::RectanglePlacement::stretchToFit);
 }
 
 void MainComponent::resized()

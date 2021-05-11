@@ -117,7 +117,7 @@ Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que se
     std::string goodBye = "MUCHAS GRACIAS!";
     int random[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
 
-    juce::Image upnaImage, upfImage;
+    juce::Image upnaImage, upfImage, jaulabImage;
  
     juce::XmlElement* testData = new juce::XmlElement("testData");
     juce::String files[8][6];
