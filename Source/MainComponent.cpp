@@ -304,9 +304,9 @@ void MainComponent::paint (juce::Graphics& g)
     stop.setBounds(w + marginButtons - width, 125, 60, 30);
     bRef.setBounds(w + marginButtons - width, 160, 60, 40);
 
-    g.drawImageWithin(upnaImage, 10, h - 80, 132, 70, juce::RectanglePlacement::stretchToFit);
-    g.drawImageWithin(upfImage, 160, h - 80, 202, 70, juce::RectanglePlacement::stretchToFit);
-    g.drawImageWithin(jaulabImage, w - 169, h - 80, 159, 70, juce::RectanglePlacement::stretchToFit);
+    g.drawImageWithin(upnaImage, 10, h - 70, 113, 60, juce::RectanglePlacement::stretchToFit);
+    g.drawImageWithin(upfImage, 140, h - 70, 173, 60, juce::RectanglePlacement::stretchToFit);
+    g.drawImageWithin(jaulabImage, w - 157, h - 70, 137, 60, juce::RectanglePlacement::stretchToFit);
 }
 
 void MainComponent::resized()
