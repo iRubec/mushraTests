@@ -94,11 +94,12 @@ private:
     // Your private member variables go here...
     juce::AlertWindow* alert;
     juce::TextButton bRef, nextButton, stop;
-    int test = 0, avaiableOutputs = 0, marginButtons = 20, channels = 2;
+    int avaiableOutputs = 0, marginButtons = 20, channels = 2;
+    juce::TextEditor impresions;
 
     juce::String midiText = "MIDI not found";
     juce::String testText = "Test 1";
-    int testNumber = 1, stimuli = 0, groups = 0;
+    int testNumber = 0, stimuli = 0, groups = 0;
     float duration, posPlayer = 0.0;
     juce::String path;
     juce::Array<juce::Slider*> arraySliders;
@@ -111,6 +112,7 @@ private:
     std::string perceptions[5] = {"Excelente", "Bueno", "Igual", "Pobre", "Malo"};
     std::string buttonText[8] = { "1", "2", "3", "4", "5", "6", "7", "8" };
     std::string names[8] = { "ref", "anch", "s1", "s2", "s3", "s4", "s5", "s6" };
+    std::string descriptionText = "Descripcion del test";/*
     std::string descriptionText = "Esta es la primera linea de la descripcion del test.\n\
 Ahora va la segunda, que es lo que ha pedido Ricardo y yo soy un mandado.\n\
  1. Excelente: \n\
@@ -118,7 +120,7 @@ Ahora va la segunda, que es lo que ha pedido Ricardo y yo soy un mandado.\n\
  3. Igual: \n\
  4. Peor: \n\
  5. Terrible: \n\
-Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que seguro que alguna pega le saca";
+Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que seguro que alguna pega le saca";*/
     std::string welcome = "Hola!";
     std::string welcomeText = "Vas a hacer un test mushra";
     std::string goodBye = "MUCHAS GRACIAS!";

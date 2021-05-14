@@ -80,6 +80,12 @@ MainComponent::MainComponent()
     nextButton.addListener(this);
     addAndMakeVisible(nextButton);
     
+    // Impresions text box
+    impresions.setTextToShowWhenEmpty("Observaciones", juce::Colours::lightgrey);
+    impresions.setReturnKeyStartsNewLine(true);
+    impresions.setMultiLine(true);
+    addAndMakeVisible(impresions);
+
     //==============================================================================
     //================================== IMAGES ====================================
     //==============================================================================
@@ -306,6 +312,7 @@ void MainComponent::paint (juce::Graphics& g)
     nextButton.setBounds(w + marginButtons - width, 80, 60, 40);
     stop.setBounds(w + marginButtons - width, 125, 60, 30);
     bRef.setBounds(w + marginButtons - width, 160, 60, 40);
+    impresions.setBounds(330, h-70, w - 490, 60);
 
     g.drawImageWithin(upnaImage, 10, h - 70, 113, 60, juce::RectanglePlacement::stretchToFit);
     g.drawImageWithin(upfImage, 140, h - 70, 173, 60, juce::RectanglePlacement::stretchToFit);
@@ -333,8 +340,8 @@ void MainComponent::buttonClicked(juce::Button* button)
         stopTimer();
         isPlaying = false;
         handleTests();
-        testNumber = testNumber + 1;
-        testText = "Test " + std::to_string(testNumber);
+        testText = "Test " + std::to_string(testNumber + 1);
+        impresions.clear();
         for (auto s : arraySliders) { s->setValue(0); }
         repaint();
     }
@@ -377,7 +384,7 @@ void MainComponent::handleTests()
 {
     isPlaying = false;
     dataExport();
-    test = test + 1;
+    testNumber = testNumber + 1;
 
     // Randomization
     for (int i = 0; i < stimuli; i++) {
@@ -389,7 +396,7 @@ void MainComponent::handleTests()
 
     juce::WavAudioFormat wavFormat;
 
-    juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g" + juce::String(test + 1) + "/" + files[test][0]).getFullPathName());
+    juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g" + juce::String(testNumber + 1) + "/" + files[testNumber][0]).getFullPathName());
     auto is = new juce::FileInputStream(file);
 
     juce::AudioSampleBuffer newBuffer;
@@ -402,7 +409,7 @@ void MainComponent::handleTests()
 
     for (int i = 0; i < stimuli; i++) {
 
-        juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g" + juce::String(test+1) + "/" + files[test][random[i]]).getFullPathName());
+        juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g" + juce::String(testNumber+1) + "/" + files[testNumber][random[i]]).getFullPathName());
         auto is = new juce::FileInputStream(file);
 
         juce::AudioSampleBuffer newBuffer;
@@ -500,9 +507,14 @@ void MainComponent::dataExport()
         testElement->addChildElement(h);
     };
 
+    // Add the observations
+    juce::XmlElement* text = new juce::XmlElement("observations");
+    text->addTextElement(impresions.getText());
+    testElement->addChildElement(text);
+
     testData->addChildElement(testElement);
 
-    if (testNumber == groups)
+    if (testNumber + 1 == groups)
     {
         auto xmlString = testData->toString();
 
