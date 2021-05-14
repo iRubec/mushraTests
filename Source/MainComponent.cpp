@@ -219,6 +219,7 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double newSample
     else
     {
         ch = true;
+        setAudioChannels(0, channels);
     };
 }
 
