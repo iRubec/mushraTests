@@ -179,7 +179,23 @@ MainComponent::MainComponent()
         // Specify the number of input and output channels that we want to open
         setAudioChannels (0, channels);
     }
+    /*
+    auto* device = deviceManager.getCurrentAudioDevice();
+    auto activeOutputChannels = device->getActiveOutputChannels();
+    avaiableOutputs = activeOutputChannels.countNumberOfSetBits();
 
+    if (channels > avaiableOutputs)
+    {
+        ch = false;
+        std::string str = "Estás intentando reproducir archivos con más canales de los disponibles";
+        alert->showMessageBox(juce::AlertWindow::AlertIconType::WarningIcon, "Error", str, "OK");
+    }
+    else
+    {
+        ch = true;
+        setAudioChannels(0, channels);
+    };
+    */
     //==============================================================================
     //============================== audioSetupComp ================================
     //==============================================================================
@@ -206,21 +222,6 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double newSample
     sampleRate = newSampleRate;
     expectedSamplesPerBlock = samplesPerBlockExpected;
 
-    auto* device = deviceManager.getCurrentAudioDevice();
-    auto activeOutputChannels = device->getActiveOutputChannels();
-    avaiableOutputs = activeOutputChannels.countNumberOfSetBits();
-
-    if (channels > avaiableOutputs)
-    {
-        ch = false;
-        std::string str = "Estás intentando reproducir archivos con más canales de los disponibles";
-        alert->showMessageBox(juce::AlertWindow::AlertIconType::WarningIcon, "Error", str, "OK");
-    }
-    else
-    {
-        ch = true;
-        setAudioChannels(0, channels);
-    };
 }
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
