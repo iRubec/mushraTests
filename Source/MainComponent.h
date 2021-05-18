@@ -34,7 +34,7 @@ public:
 
     //==============================================================================
     void buttonClicked(juce::Button* button) override;
-    void timerCallback();
+    void timerCallback() override;
     //==============================================================================
     
     void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override

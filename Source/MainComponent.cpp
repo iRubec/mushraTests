@@ -166,7 +166,7 @@ MainComponent::MainComponent()
         }
 
     }
-    
+
     // Some platforms require permissions to open input channels so request that here
     if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio)
         && ! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::recordAudio))
@@ -179,27 +179,12 @@ MainComponent::MainComponent()
         // Specify the number of input and output channels that we want to open
         setAudioChannels (0, channels);
     }
-    /*
-    auto* device = deviceManager.getCurrentAudioDevice();
-    auto activeOutputChannels = device->getActiveOutputChannels();
-    avaiableOutputs = activeOutputChannels.countNumberOfSetBits();
-
-    if (channels > avaiableOutputs)
-    {
-        ch = false;
-        std::string str = "Estás intentando reproducir archivos con más canales de los disponibles";
-        alert->showMessageBox(juce::AlertWindow::AlertIconType::WarningIcon, "Error", str, "OK");
-    }
-    else
-    {
-        ch = true;
-        setAudioChannels(0, channels);
-    };
-    */
+       
     //==============================================================================
     //============================== audioSetupComp ================================
     //==============================================================================
     addAndMakeVisible(audioSetupComp);
+    //startTimer(1000);
 
 }
 
@@ -531,13 +516,6 @@ void MainComponent::dataExport()
     };
 }
 
-void MainComponent::timerCallback()
-{
-    posPlayer = posPlayer + 750/(duration/0.02);
-    if (posPlayer >= 750.0) { posPlayer = 0.0; };
-    repaint();
-}
-
 void MainComponent::readJSON()
 {
     juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../testDescription.json").getFullPathName());
@@ -632,4 +610,37 @@ void MainComponent::readJSON()
             files[7][7] = parsedJson["FileNames"]["g8"]["s6"];
         };
     };
+}
+
+//==============================================================================
+//=================================== TIMER ====================================
+//==============================================================================
+// Esta función leera el estado de carga de la cpu y también el dispositivo que
+// se está usando para la salida de audio. Se lellama cada medio segundo con el
+// Timer
+void MainComponent::timerCallback()
+{
+    // Leemos el dispositivo que se está usando y le pasamos la info al header
+    deviceManager.getAudioDeviceSetup();
+    auto* device = deviceManager.getCurrentAudioDevice();
+    auto activeOutputChannels = device->getActiveOutputChannels();
+    avaiableOutputs = activeOutputChannels.countNumberOfSetBits();
+
+    if (channels > avaiableOutputs)
+    {
+        ch = false;
+        std::string str = "Estás intentando reproducir archivos con más canales de los disponibles";
+        alert->showMessageBox(juce::AlertWindow::AlertIconType::WarningIcon, "Error", str, "OK");
+    }
+    else
+    {
+        ch = true;
+        setAudioChannels(0, channels);
+    };
+
+    /*
+    posPlayer = posPlayer + 750/(duration/0.02);
+    if (posPlayer >= 750.0) { posPlayer = 0.0; };
+    repaint();
+    */
 }
