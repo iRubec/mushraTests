@@ -9,26 +9,26 @@ MainComponent::MainComponent()
     // Taking the size of the screen
     juce::Rectangle<int> r = juce::Desktop::getInstance().getDisplays().getMainDisplay().userArea;
     //juce::Rectangle<int> r(0, 0, 1280, 1024);
-
-    int marginY = 100;
+    
+    int marginY = 100, marginX = 0;
     if (r.getHeight() >= 980) {
-        marginY = 250; marginButtons = 0;
+        marginY = 250; marginButtons = 25; marginX = 300;
     };
     
     // Setting the size of the window
-    centreWithSize(r.getWidth() - 100, r.getHeight()- marginY);
+    centreWithSize(r.getWidth() - 500 + marginX, r.getHeight()- marginY);
 
     // Alert window with the welcome message
     alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, welcome, welcomeText, "Adelante!");
 
     // Reading the info of the test to do
     readJSON();
-
+  
     //==============================================================================
     //=========================== SLIDERS AND BUTTONS ==============================
     //==============================================================================
     // Variables to draw set the sliders and buttons size
-    int width = getWidth() - 400;
+    int width = getWidth();
     float sliderWidth = (width - 20) / 10;
 
     // We will create 8 sliders with their buttons in the top. Only the number of stimuli will be enabled and more coloured
@@ -63,28 +63,65 @@ MainComponent::MainComponent()
     };
 
     // Stop button
-    stop.setButtonText("STOP");
-    stop.setName("stop");
-    stop.addListener(this);
-    addAndMakeVisible(stop);
+    stopBut.setButtonText("STOP");
+    stopBut.setName("stop");
+    stopBut.addListener(this);
+    addAndMakeVisible(stopBut);
 
     // Ref button
-    bRef.setButtonText("REF");
-    bRef.setName("ref");
-    bRef.addListener(this);
-    addAndMakeVisible(bRef);
+    refBut.setButtonText("REF");
+    refBut.setName("ref");
+    refBut.addListener(this);
+    addAndMakeVisible(refBut);
+
+    // Anchor button
+    anchorBut.setButtonText("BIG");
+    anchorBut.setName("anchor");
+    anchorBut.addListener(this);
+    addAndMakeVisible(anchorBut);
+    anchorBut.setVisible(false);
+
+    // Prev button
+    prevBut.setButtonText("<");
+    prevBut.setName("prev");
+    //prevBut.addListener(this);
+    addAndMakeVisible(prevBut);
 
     // Next button
-    nextButton.setButtonText(">");
-    nextButton.setName("next");
-    nextButton.addListener(this);
-    addAndMakeVisible(nextButton);
+    nextBut.setButtonText(">");
+    nextBut.setName("next");
+    nextBut.addListener(this);
+    addAndMakeVisible(nextBut);
     
     // Impresions text box
     impresions.setTextToShowWhenEmpty("Observaciones", juce::Colours::lightgrey);
     impresions.setReturnKeyStartsNewLine(true);
     impresions.setMultiLine(true);
     addAndMakeVisible(impresions);
+
+    // Menu button
+    int menuSize;
+    juce::String menuName = "menu_png";
+    auto* playData = BinaryData::getNamedResource(menuName.toUTF8(), menuSize);
+    juce::Image menuIcon = juce::ImageFileFormat::loadFrom(playData, menuSize);
+    menuBut.setImages(false, true, true, menuIcon, 0.6f, {}, menuIcon, 1.0f, {}, menuIcon, 1.0f, {}, 0);
+    menuBut.setName("menu");
+    menuBut.setBounds(width - 35, 5, 30, 30);
+    menuBut.setTooltip("Audio controls");
+    menuBut.setToggleState(true, juce::sendNotification);
+    menuBut.onClick = [this] {
+        menuBut.setToggleState(!menuBut.getToggleState(), juce::NotificationType::dontSendNotification);
+        showMenu = menuBut.getToggleState(); 
+        repaint(); };
+    addAndMakeVisible(menuBut);
+
+    // For width tests
+    if (widthTest == 1)
+    {
+        textForWidth = 200;
+        paintCircles = true;
+        anchorBut.setVisible(true);
+    };
 
     //==============================================================================
     //================================== IMAGES ====================================
@@ -132,6 +169,15 @@ MainComponent::MainComponent()
     buffersArray[0] = newBuffer;
     duration = reader->lengthInSamples / reader->sampleRate;
     
+    // Anchor audio
+    juce::File fileAnchor(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g1/" + files[0][1]).getFullPathName());
+    auto isAnchor = new juce::FileInputStream(fileAnchor);
+    juce::AudioSampleBuffer newBufferAnchor;
+    std::unique_ptr<juce::AudioFormatReader> readerAnchor(wavFormat.createReaderFor(isAnchor, true));
+    newBufferAnchor.setSize((int)readerAnchor->numChannels, (int)readerAnchor->lengthInSamples);
+    readerAnchor->read(&newBufferAnchor, 0, (int)readerAnchor->lengthInSamples, 0, true, true);
+    buffersArray[9] = newBufferAnchor;
+
     // Now reading the stimuli audios
     for (int i = 0; i < stimuli; i++) {
        
@@ -255,13 +301,9 @@ void MainComponent::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (juce::Colours::lightgrey);
-    g.setColour(juce::Colours::grey);
-    g.fillRect(getWidth()-400, 0, 400, getHeight());
-    
-    audioSetupComp.setBounds(getWidth() - 400, 0, 400, getHeight());
 
     // You can add your drawing code here!
-    float w = getWidth() - 400;
+    float w = getWidth();
     float h = getHeight();
     float width = (w - 20) / 10;
     /*
@@ -274,36 +316,98 @@ void MainComponent::paint (juce::Graphics& g)
     g.setColour(juce::Colours::black);
     g.drawLine(150 + posPlayer, 100, 150 + posPlayer, 130, 1.0f);
     */
+    audioSetupComp.setBounds(w - 400, 50, 400, 350);
     g.setColour(juce::Colours::black);
-    g.setFont(18.0f);
-    g.drawText(testText, 10, 10, 60, 20, juce::Justification::left, false);
-    g.setFont(10.0f);
-    g.drawText(midiText, w - 150, 5, 140, 20, juce::Justification::right, false);
+    g.setFont(12.0f);
+    g.drawText(testText, 10, 2, 80, 20, juce::Justification::left, false);
+    g.setFont(12.0f);
+    g.drawText(midiText, 10, 20, 80, 20, juce::Justification::left, false);
     
-    juce::Rectangle<int> textBounds(10, 40, w - 105, 200);
+    juce::Rectangle<int> textBounds(10, 40, w - 105 - textForWidth, 200);
     g.setColour(juce::Colours::grey);
     g.fillRect(textBounds);
     g.setColour(juce::Colours::white);
     g.setFont(18.0f);
-    g.drawMultiLineText(descriptionText, 15, 60, w - 110, juce::Justification::centredLeft);
+    g.drawMultiLineText(paintCircles ? descriptionTextWidth : descriptionText, 15, 60, w - 110, juce::Justification::centredLeft);
 
     g.setFont(18.0f);
     g.setColour(juce::Colours::black);
     for (int i = 0; i < 6; i++)
     {
         g.drawText(juce::String(100 - i*20), 20, 305 + 56 * i, 40, 10, juce::Justification::right, false);
-        if (i < 5) { g.drawText(perceptions[i], 70, 310 + 56 * i, width - 20, 56, juce::Justification::centred, false); }
+        if (i < 5) { g.drawText(paintCircles ? perceptionsWidth[i] : perceptions[i], 70, 310 + 56 * i, width - 20, 56, juce::Justification::centred, false); }
         g.drawLine(70 , 310 + 56 * i, w - 80, 310 + 56 * i);
     }
     
-    nextButton.setBounds(w + marginButtons - width, 80, 60, 40);
-    stop.setBounds(w + marginButtons - width, 125, 60, 30);
-    bRef.setBounds(w + marginButtons - width, 160, 60, 40);
+    prevBut.setBounds(w + marginButtons - width, 80, 28, 40);
+    nextBut.setBounds(w + marginButtons - width + 34, 80, 28, 40);
+    stopBut.setBounds(w + marginButtons - width, 125, 60, 30);
+    refBut.setBounds(w + marginButtons - width, 160, 60, 40);
+    anchorBut.setBounds(w + marginButtons - width, 205, 60, 40);
     impresions.setBounds(330, h-70, w - 490, 60);
 
     g.drawImageWithin(upnaImage, 10, h - 70, 113, 60, juce::RectanglePlacement::stretchToFit);
     g.drawImageWithin(upfImage, 140, h - 70, 173, 60, juce::RectanglePlacement::stretchToFit);
     g.drawImageWithin(jaulabImage, w - 157, h - 70, 137, 60, juce::RectanglePlacement::stretchToFit);
+
+    if (showMenu)
+    {
+        juce::Rectangle<int> audioComp(w - 400, 0, 400, 350);
+        g.setColour(juce::Colours::grey);
+        g.fillRect(audioComp);
+        g.setColour(juce::Colours::white);
+        g.drawRect(audioComp, 2.0f);
+        stopBut.setVisible(false);
+        refBut.setVisible(false);
+        nextBut.setVisible(false);
+        prevBut.setVisible(false);
+        for (int i = 5; i < 8; i++)
+        {
+            arrayButtons[i]->setVisible(false);
+            arraySliders[i]->setVisible(false);
+        };
+        audioSetupComp.setVisible(true);
+    }
+    else
+    {
+        stopBut.setVisible(true);
+        refBut.setVisible(true);
+        nextBut.setVisible(true);
+        prevBut.setVisible(true);
+        for (int i = 5; i < 8; i++)
+        {
+            arrayButtons[i]->setVisible(true);
+            arraySliders[i]->setVisible(true);
+        };
+        audioSetupComp.setVisible(false);
+    };
+
+    if (paintCircles && !showMenu)
+    {
+        //juce::Rectangle<int> textBounds(10, 40, w - 105 - textForWidth, 200);
+        if (buffer != 0 && buffer != 9)
+        {
+            g.setColour(juce::Colours::forestgreen);
+            g.fillEllipse((w - 95 - textForWidth) + (textForWidth / 2) - 25 - circleWidth/2, 115- circleWidth/2, 50 + circleWidth, 50 + circleWidth);
+            g.setColour(juce::Colours::black);
+            g.drawEllipse((w - 95 - textForWidth) + (textForWidth / 2) - 90, 50, 180, 180, 2.0f);
+            g.drawEllipse((w - 95 - textForWidth) + (textForWidth / 2) - 25, 115, 50, 50, 2.0f);
+        }
+        else if(buffer == 0)
+        {
+            g.setColour(juce::Colours::forestgreen);
+            g.fillEllipse((w - 95 - textForWidth) + (textForWidth / 2) - 25, 115, 50, 50);
+            g.setColour(juce::Colours::black);
+            g.drawEllipse((w - 95 - textForWidth) + (textForWidth / 2) - 25, 115, 50, 50, 2.0f);
+        }
+        else if (buffer == 9)
+        {
+            g.setColour(juce::Colours::forestgreen);
+            g.fillEllipse((w - 95 - textForWidth) + (textForWidth / 2) - 90, 50, 180, 180);
+            g.setColour(juce::Colours::black);
+            g.drawEllipse((w - 95 - textForWidth) + (textForWidth / 2) - 90, 50, 180, 180, 2.0f);
+        }
+    };
 }
 
 void MainComponent::resized()
@@ -341,30 +445,38 @@ void MainComponent::buttonClicked(juce::Button* button)
     else if (name == "6"){ buffer = 6; }
     else if (name == "7") { buffer = 7; }
     else if (name == "8") { buffer = 8; }
-
+    else if (name == "anchor") { buffer = 9; }
+        
     for (int i = 0; i < stimuli; i++)
     {
         arraySliders[i]->setEnabled(false);
         arraySliders[i]->setColour(0x1001300, juce::Colours::grey);
         arraySliders[i]->setAlpha(0.5f);
-        arrayButtons[i]->setColour(0x1000100, juce::Colours::black);
-        bRef.setColour(0x1000100, juce::Colours::black);
+        arrayButtons[i]->setColour(0x1000100, juce::Colours::black); 
     }
+    refBut.setColour(0x1000100, juce::Colours::black);
+    anchorBut.setColour(0x1000100, juce::Colours::black);
 
-    if (buffer != 0 && isPlaying)
+    if (buffer != 0 && buffer != 9 && isPlaying)
     {
         arraySliders[buffer - 1]->setEnabled(true);
         arraySliders[buffer - 1]->setColour(0x1001300, juce::Colours::lightgreen);
         arraySliders[buffer - 1]->setAlpha(1.0f);
         arrayButtons[buffer - 1]->setColour(0x1000100, juce::Colours::lightgreen);
-        bRef.setColour(0x1000100, juce::Colours::black);
+        circleWidth = arraySliders[buffer - 1]->getValue() * 1.3;
     }
     
     if(buffer == 0 && isPlaying)
     {
-        bRef.setColour(0x1000100, juce::Colours::lightgreen);
+        refBut.setColour(0x1000100, juce::Colours::lightgreen);
     }
 
+    if (buffer == 9 && isPlaying)
+    {
+        anchorBut.setColour(0x1000100, juce::Colours::lightgreen);
+    }
+
+    repaint();
 };
 
 void MainComponent::handleTests()
@@ -383,16 +495,23 @@ void MainComponent::handleTests()
 
     juce::WavAudioFormat wavFormat;
 
+    // Reference audio
     juce::File file(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g" + juce::String(testNumber + 1) + "/" + files[testNumber][0]).getFullPathName());
     auto is = new juce::FileInputStream(file);
-
     juce::AudioSampleBuffer newBuffer;
     std::unique_ptr<juce::AudioFormatReader> reader(wavFormat.createReaderFor(is, true));
     newBuffer.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
     reader->read(&newBuffer, 0, (int)reader->lengthInSamples, 0, true, true);
-
     buffersArray[0] = newBuffer;
-    duration = reader->lengthInSamples / reader->sampleRate;
+    
+    // Anchor audio
+    juce::File fileAnchor(juce::File::getCurrentWorkingDirectory().getChildFile("../../audios/g" + juce::String(testNumber + 1) + "/" + files[testNumber][1]).getFullPathName());
+    auto isAnchor = new juce::FileInputStream(fileAnchor);
+    juce::AudioSampleBuffer newBufferAnchor;
+    std::unique_ptr<juce::AudioFormatReader> readerAnchor(wavFormat.createReaderFor(isAnchor, true));
+    newBufferAnchor.setSize((int)readerAnchor->numChannels, (int)readerAnchor->lengthInSamples);
+    readerAnchor->read(&newBufferAnchor, 0, (int)readerAnchor->lengthInSamples, 0, true, true);
+    buffersArray[9] = newBufferAnchor;
 
     for (int i = 0; i < stimuli; i++) {
 
@@ -407,6 +526,12 @@ void MainComponent::handleTests()
         buffersArray[i + 1] = newBuffer;
     };
 
+    if (testNumber+1 == widthTest)
+    {
+        textForWidth = 200;
+        paintCircles = true;
+        anchorBut.setVisible(true);
+    };
 }
 
 void MainComponent::dataExport()
@@ -526,9 +651,10 @@ void MainComponent::readJSON()
     if (juce::JSON::parse(data, jsonToParse).ok()) {
 
         path = parsedJson["Path"];
-        groups = parsedJson["Groups"];
-        stimuli = parsedJson["StimuliPerGroup"];
-        channels = parsedJson["Channels"];
+        channels = (int)parsedJson["Channels"];
+        widthTest = (int)parsedJson["WidthTest"];
+        groups = (int)parsedJson["Groups"];
+        stimuli = (int)parsedJson["StimuliPerGroup"];
 
         files[0][0] = parsedJson["FileNames"]["g1"]["ref"];
         files[0][1] = parsedJson["FileNames"]["g1"]["anchor"];

@@ -1,7 +1,9 @@
 {
-  "Desc": "Test descriptions",
+  "Desc": "This is your MUSHRA test!",
+  "Channels": 2,
+  "WidthTest": 2,
   "Groups": 2,
-  "StimuliPerGroup": 6,
+  "StimuliPerGroup": 8,
   "Path": "C:/Users/ruben/Desktop/SMC/MASTER_THESIS/JUCE/Tests/audios/",
   "FileNames":
   {
@@ -13,8 +15,8 @@
     	 "s2": "g1_ambi_o3.wav",
     	 "s3": "g1_SWF_0.wav",
     	 "s4": "g1_SWF_1.wav",
-    	 "s5": "",
-    	 "s6": ""
+    	 "s5": "g1_SWF_1.wav",
+    	 "s6": "g1_SWF_1.wav"
     	},
     "g2":
     	{
@@ -25,8 +27,8 @@
     	 "s3": "g2_ambi_o3.wav",
     	 "s4": "g2_SWF_0.wav",
     	 "s5": "g2_SWF_1.wav",
-    	 "s5": "",
-    	 "s6": ""
+    	 "s5": "g2_SWF_1.wav",
+    	 "s6": "g2_SWF_1.wav"
     	},
     "g3":
     	{

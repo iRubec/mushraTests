@@ -6,6 +6,7 @@
     <GROUP id="{EF19E173-3C11-4E9B-7969-E41D3245B512}" name="Source">
       <GROUP id="{04474126-35A2-337B-11A4-8A9E8DC62239}" name="images">
         <FILE id="CJairX" name="jaulab.png" compile="0" resource="1" file="Source/images/jaulab.png"/>
+        <FILE id="EYj00Z" name="menu.png" compile="0" resource="1" file="Source/images/menu.png"/>
         <FILE id="frlsny" name="owl_front.png" compile="0" resource="1" file="Source/images/owl_front.png"/>
         <FILE id="R3ZquZ" name="upf.png" compile="0" resource="1" file="Source/images/upf.png"/>
         <FILE id="PfBOBT" name="upna.png" compile="0" resource="1" file="Source/images/upna.png"/>

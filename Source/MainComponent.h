@@ -61,8 +61,12 @@ public:
         //float div = 100.0 / 128.0;
         //float div = 0.78125;
         float div = 0.787402;
-        if(arraySliders.getUnchecked(sliderPositions[noteNumber])->isEnabled())
+        if (arraySliders.getUnchecked(sliderPositions[noteNumber])->isEnabled())
+        {
             arraySliders.getUnchecked(sliderPositions[noteNumber])->setValue(round(velocity * div));
+            circleWidth = round(velocity * 1.0236);
+            repaint();
+        };
     };
 
     void midiButton(float noteNumber)
@@ -70,11 +74,11 @@ public:
         if(noteNumber <= 24)
             arrayButtons[buttonPositions[noteNumber]]->triggerClick();
         else if (noteNumber == 27)
-            bRef.triggerClick();
+            refBut.triggerClick();
         else if (noteNumber == 26)
-            stop.triggerClick();
+            stopBut.triggerClick();
         else if (noteNumber == 25)
-            nextButton.triggerClick();
+            nextBut.triggerClick();
     };
     
     //==============================================================================
@@ -93,13 +97,16 @@ private:
     //==============================================================================
     // Your private member variables go here...
     juce::AlertWindow* alert;
-    juce::TextButton bRef, nextButton, stop;
+    juce::TextButton refBut, anchorBut, prevBut, nextBut, stopBut;
+    juce::ImageButton menuBut;
     int avaiableOutputs = 0, marginButtons = 20, channels = 2;
     juce::TextEditor impresions;
+    int textForWidth = 0, circleWidth = 0.0;
+    bool showMenu = true, paintCircles = false;
 
     juce::String midiText = "MIDI not found";
     juce::String testText = "Test 1";
-    int testNumber = 0, stimuli = 0, groups = 0;
+    int testNumber = 0, stimuli = 0, groups = 0, widthTest = 0;
     float duration, posPlayer = 0.0;
     juce::String path;
     juce::Array<juce::Slider*> arraySliders;
@@ -110,9 +117,9 @@ private:
    
     // Textos!
     std::string perceptions[5] = {"Excelente", "Bueno", "Igual", "Pobre", "Malo"};
+    std::string perceptionsWidth[5] = { "Big", "", "", "", "Ref"};
     std::string buttonText[8] = { "1", "2", "3", "4", "5", "6", "7", "8" };
     std::string names[8] = { "ref", "anch", "s1", "s2", "s3", "s4", "s5", "s6" };
-    std::string descriptionText = "Descripcion del test";/*
     std::string descriptionText = "Esta es la primera linea de la descripcion del test.\n\
 Ahora va la segunda, que es lo que ha pedido Ricardo y yo soy un mandado.\n\
  1. Excelente: \n\
@@ -120,7 +127,8 @@ Ahora va la segunda, que es lo que ha pedido Ricardo y yo soy un mandado.\n\
  3. Igual: \n\
  4. Peor: \n\
  5. Terrible: \n\
-Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que seguro que alguna pega le saca";*/
+Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que seguro que alguna pega le saca";
+    std::string descriptionTextWidth = "Descripcion del test para la anchura";
     std::string welcome = "Hola!";
     std::string welcomeText = "Vas a hacer un test mushra";
     std::string goodBye = "MUCHAS GRACIAS!";
@@ -135,7 +143,7 @@ Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que se
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
 	
-    juce::AudioSampleBuffer buffersArray[9];
+    juce::AudioSampleBuffer buffersArray[10];
     juce::MemoryInputStream* wavs[8];
 
     juce::MidiKeyboardState keyboardState;
