@@ -86,13 +86,6 @@ public:
     void dataExport();
     void readJSON();
 
-    /*
-    void audioDeviceAboutToStart(juce::AudioIODevice* device) override {};
-    void audioDeviceIOCallback(const float** /*inputChannelData, int /*numInputChannels,
-        float** outputChannelData, int numOutputChannels,
-        int numSamples) override {};
-    */
-
 private:
     //==============================================================================
     // Your private member variables go here...
@@ -111,9 +104,6 @@ private:
     juce::String path;
     juce::Array<juce::Slider*> arraySliders;
     juce::Array<juce::TextButton*> arrayButtons;
-    std::map<int, int> sliderPositions = { {19, 0,}, {23, 1,}, {27, 2,}, {31, 3,}, {49, 4,}, {53, 5,}, {57, 6,}, {61, 7,} };
-    std::map<int, int> buttonPositions = { {1, 0,}, {4, 1,}, {7, 2,}, {10, 3,}, {13, 4,}, {16, 5,}, {19, 6,}, {22, 7,},  
-                                         {3, 0,}, {6, 1,}, {9, 2,}, {12, 3,}, {15, 4,}, {18, 5,}, {21, 6,}, {24, 7,} };
    
     // Textos!
     std::string perceptions[5] = {"Excelente", "Bueno", "Igual", "Pobre", "Malo"};
@@ -136,9 +126,13 @@ Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que se
 
     juce::Image upnaImage, upfImage, jaulabImage;
  
+    // XML element to create the output file
     juce::XmlElement* testData = new juce::XmlElement("testData");
+    
+    // String matrix to save the files paths 
     juce::String files[8][8];
 
+    // Audio components
     juce::AudioDeviceSelectorComponent audioSetupComp;
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
@@ -146,14 +140,15 @@ Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que se
     juce::AudioSampleBuffer buffersArray[10];
     juce::MemoryInputStream* wavs[8];
 
+    // MIDI components and dictionaries
     juce::MidiKeyboardState keyboardState;
     juce::MidiKeyboardComponent keyboardComponent;
     bool isAddingFromMidiInput = false;
+    std::map<int, int> sliderPositions = { {19, 0,}, {23, 1,}, {27, 2,}, {31, 3,}, {49, 4,}, {53, 5,}, {57, 6,}, {61, 7,} };
+    std::map<int, int> buttonPositions = { {1, 0,}, {4, 1,}, {7, 2,}, {10, 3,}, {13, 4,}, {16, 5,}, {19, 6,}, {22, 7,},
+                                         {3, 0,}, {6, 1,}, {9, 2,}, {12, 3,}, {15, 4,}, {18, 5,}, {21, 6,}, {24, 7,} };
 
-    // Waveform
-    juce::AudioThumbnailCache thumbnailCache;
-    juce::AudioThumbnail thumbnail;
-
+    // Playback variables
     double sampleRate = 0.0;
     int expectedSamplesPerBlock = 0;
     int position = 0;

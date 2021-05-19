@@ -3,8 +3,7 @@
 //==============================================================================
 MainComponent::MainComponent()
     : keyboardComponent(keyboardState, juce::MidiKeyboardComponent::horizontalKeyboard),
-    audioSetupComp(deviceManager, 0, 24, 0,  24, false, false, false, true),
-    thumbnailCache(5), thumbnail(512, formatManager, thumbnailCache)
+    audioSetupComp(deviceManager, 0, 24, 0,  24, false, false, false, true)
 {
     // Taking the size of the screen
     juce::Rectangle<int> r = juce::Desktop::getInstance().getDisplays().getMainDisplay().userArea;
@@ -306,16 +305,7 @@ void MainComponent::paint (juce::Graphics& g)
     float w = getWidth();
     float h = getHeight();
     float width = (w - 20) / 10;
-    /*
-    juce::Rectangle<int> thumbnailBounds(150, 100, w - 250, 30);
-    g.setColour(juce::Colours::white);
-    g.fillRect(thumbnailBounds);
-    g.setColour(juce::Colours::aqua);
-    thumbnail.drawChannel(g, thumbnailBounds, 0.0, thumbnail.getTotalLength(), 2, 1.0f);
-    //thumbnail.drawChannels(g, thumbnailBounds, 0.0, thumbnail.getTotalLength(), 1.0f);
-    g.setColour(juce::Colours::black);
-    g.drawLine(150 + posPlayer, 100, 150 + posPlayer, 130, 1.0f);
-    */
+
     audioSetupComp.setBounds(w - 400, 50, 400, 350);
     g.setColour(juce::Colours::black);
     g.setFont(12.0f);
