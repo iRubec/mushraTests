@@ -74,7 +74,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(refBut);
 
     // Anchor button
-    anchorBut.setButtonText("BIG");
+    anchorBut.setButtonText("XL");
     anchorBut.setName("anchor");
     anchorBut.addListener(this);
     addAndMakeVisible(anchorBut);
@@ -120,6 +120,7 @@ MainComponent::MainComponent()
         textForWidth = 200;
         paintCircles = true;
         anchorBut.setVisible(true);
+        refBut.setButtonText("XS");
     };
 
     //==============================================================================
@@ -518,9 +519,11 @@ void MainComponent::handleTests()
 
     if (testNumber+1 == widthTest)
     {
+        alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "Cambio de test", "Comienzo del segundo test", "Continuar");
         textForWidth = 200;
         paintCircles = true;
         anchorBut.setVisible(true);
+        refBut.setButtonText("XS");
     };
 }
 
@@ -626,8 +629,10 @@ void MainComponent::dataExport()
         newFile.appendText(xmlString);
 
         alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, goodBye, "", "Salir");
-
+        MainComponent::shutdownAudio();
         juce::JUCEApplicationBase::quit();
+        juce::JUCEApplication::getInstance()->systemRequestedQuit();
+        //juce::JUCEApplicationBase::quit();
     };
 }
 
@@ -724,7 +729,77 @@ void MainComponent::readJSON()
             files[7][5] = parsedJson["FileNames"]["g8"]["s4"];
             files[7][6] = parsedJson["FileNames"]["g8"]["s5"];
             files[7][7] = parsedJson["FileNames"]["g8"]["s6"];
-        };
+        }
+        if (groups >= 9) {
+            files[8][0] = parsedJson["FileNames"]["g9"]["ref"];
+            files[8][1] = parsedJson["FileNames"]["g9"]["anchor"];
+            files[8][2] = parsedJson["FileNames"]["g9"]["s1"];
+            files[8][3] = parsedJson["FileNames"]["g9"]["s2"];
+            files[8][4] = parsedJson["FileNames"]["g9"]["s3"];
+            files[8][5] = parsedJson["FileNames"]["g9"]["s4"];
+            files[8][6] = parsedJson["FileNames"]["g9"]["s5"];
+            files[8][7] = parsedJson["FileNames"]["g9"]["s6"];
+        }
+        if (groups >= 10) {
+            files[9][0] = parsedJson["FileNames"]["g10"]["ref"];
+            files[9][1] = parsedJson["FileNames"]["g10"]["anchor"];
+            files[9][2] = parsedJson["FileNames"]["g10"]["s1"];
+            files[9][3] = parsedJson["FileNames"]["g10"]["s2"];
+            files[9][4] = parsedJson["FileNames"]["g10"]["s3"];
+            files[9][5] = parsedJson["FileNames"]["g10"]["s4"];
+            files[9][6] = parsedJson["FileNames"]["g10"]["s5"];
+            files[9][7] = parsedJson["FileNames"]["g10"]["s6"];
+        }
+        if (groups >= 11) {
+            files[10][0] = parsedJson["FileNames"]["g11"]["ref"];
+            files[10][1] = parsedJson["FileNames"]["g11"]["anchor"];
+            files[10][2] = parsedJson["FileNames"]["g11"]["s1"];
+            files[10][3] = parsedJson["FileNames"]["g11"]["s2"];
+            files[10][4] = parsedJson["FileNames"]["g11"]["s3"];
+            files[10][5] = parsedJson["FileNames"]["g11"]["s4"];
+            files[10][6] = parsedJson["FileNames"]["g11"]["s5"];
+            files[10][7] = parsedJson["FileNames"]["g11"]["s6"];
+        }
+        if (groups >= 12) {
+            files[11][0] = parsedJson["FileNames"]["g12"]["ref"];
+            files[11][1] = parsedJson["FileNames"]["g12"]["anchor"];
+            files[11][2] = parsedJson["FileNames"]["g12"]["s1"];
+            files[11][3] = parsedJson["FileNames"]["g12"]["s2"];
+            files[11][4] = parsedJson["FileNames"]["g12"]["s3"];
+            files[11][5] = parsedJson["FileNames"]["g12"]["s4"];
+            files[11][6] = parsedJson["FileNames"]["g12"]["s5"];
+            files[11][7] = parsedJson["FileNames"]["g12"]["s6"];
+        }
+        if (groups >= 13) {
+            files[12][0] = parsedJson["FileNames"]["g13"]["ref"];
+            files[12][1] = parsedJson["FileNames"]["g13"]["anchor"];
+            files[12][2] = parsedJson["FileNames"]["g13"]["s1"];
+            files[12][3] = parsedJson["FileNames"]["g13"]["s2"];
+            files[12][4] = parsedJson["FileNames"]["g13"]["s3"];
+            files[12][5] = parsedJson["FileNames"]["g13"]["s4"];
+            files[12][6] = parsedJson["FileNames"]["g13"]["s5"];
+            files[12][7] = parsedJson["FileNames"]["g13"]["s6"];
+        }
+        if (groups >= 14) {
+            files[13][0] = parsedJson["FileNames"]["g14"]["ref"];
+            files[13][1] = parsedJson["FileNames"]["g14"]["anchor"];
+            files[13][2] = parsedJson["FileNames"]["g14"]["s1"];
+            files[13][3] = parsedJson["FileNames"]["g14"]["s2"];
+            files[13][4] = parsedJson["FileNames"]["g14"]["s3"];
+            files[13][5] = parsedJson["FileNames"]["g14"]["s4"];
+            files[13][6] = parsedJson["FileNames"]["g14"]["s5"];
+            files[13][7] = parsedJson["FileNames"]["g14"]["s6"];
+        }
+        if (groups >= 15) {
+            files[14][0] = parsedJson["FileNames"]["g15"]["ref"];
+            files[14][1] = parsedJson["FileNames"]["g15"]["anchor"];
+            files[14][2] = parsedJson["FileNames"]["g15"]["s1"];
+            files[14][3] = parsedJson["FileNames"]["g15"]["s2"];
+            files[14][4] = parsedJson["FileNames"]["g15"]["s3"];
+            files[14][5] = parsedJson["FileNames"]["g15"]["s4"];
+            files[14][6] = parsedJson["FileNames"]["g15"]["s5"];
+            files[14][7] = parsedJson["FileNames"]["g15"]["s6"];
+        }
     };
 }
 

@@ -1,9 +1,9 @@
 {
   "Desc": "This is your MUSHRA test!",
   "Channels": 2,
-  "WidthTest": 2,
-  "Groups": 2,
-  "StimuliPerGroup": 8,
+  "WidthTest": 10,
+  "Groups": 15,
+  "StimuliPerGroup": 6,
   "Path": "C:/Users/ruben/Desktop/SMC/MASTER_THESIS/JUCE/Tests/audios/",
   "FileNames":
   {
@@ -15,8 +15,8 @@
     	 "s2": "g1_ambi_o3.wav",
     	 "s3": "g1_SWF_0.wav",
     	 "s4": "g1_SWF_1.wav",
-    	 "s5": "g1_SWF_1.wav",
-    	 "s6": "g1_SWF_1.wav"
+    	 "s5": "",
+    	 "s6": ""
     	},
     "g2":
     	{
@@ -27,8 +27,8 @@
     	 "s3": "g2_ambi_o3.wav",
     	 "s4": "g2_SWF_0.wav",
     	 "s5": "g2_SWF_1.wav",
-    	 "s5": "g2_SWF_1.wav",
-    	 "s6": "g2_SWF_1.wav"
+    	 "s5": "",
+    	 "s6": ""
     	},
     "g3":
     	{
@@ -96,5 +96,82 @@
     	 "s5": "",
     	 "s6": ""
     	},
-  }
+	"g9":
+    	{
+    	 "ref": "g9_ref.wav",
+    	 "anchor":"g9_anchor.wav",
+    	 "s1": "g9_ambi_o1.wav",
+    	 "s2": "g9_ambi_o3.wav",
+    	 "s3": "g9_SWF_0.wav",
+    	 "s4": "g9_SWF_1.wav",
+    	 "s5": "",
+    	 "s6": ""
+    	},
+    "g10":
+    	{
+    	 "ref": "g10_ref.wav",
+    	 "anchor":"g10_anchor.wav",
+    	 "s1": "g10_ambi_o1.wav",
+    	 "s2": "g10_ambi_o3.wav",
+    	 "s3": "g10_SWF_0.wav",
+    	 "s4": "g10_SWF_1.wav",
+    	 "s5": "",
+    	 "s6": ""
+    	},
+    "g11":
+    	{
+    	 "ref": "g11_ref.wav",
+    	 "anchor":"g11_anchor.wav",
+    	 "s1": "g11_ambi_o1.wav",
+    	 "s2": "g11_ambi_o3.wav",
+    	 "s3": "g11_SWF_0.wav",
+    	 "s4": "g11_SWF_1.wav",
+    	 "s5": "",
+    	 "s6": ""
+    	},
+    "g12":
+    	{
+    	 "ref": "g12_ref.wav",
+    	 "anchor":"g12_anchor.wav",
+    	 "s1": "g12_ambi_o1.wav",
+    	 "s2": "g12_ambi_o3.wav",
+    	 "s3": "g12_SWF_0.wav",
+    	 "s4": "g12_SWF_1.wav",
+    	 "s5": "",
+    	 "s6": ""
+    	},
+	"g13":
+    	{
+    	 "ref": "g13_ref.wav",
+    	 "anchor":"g13_anchor.wav",
+    	 "s1": "g13_ambi_o1.wav",
+    	 "s2": "g13_ambi_o3.wav",
+    	 "s3": "g13_SWF_0.wav",
+    	 "s4": "g13_SWF_1.wav",
+    	 "s5": "",
+    	 "s6": ""
+    	},
+    "g14":
+    	{
+    	 "ref": "g14_ref.wav",
+    	 "anchor":"g14_anchor.wav",
+    	 "s1": "g14_ambi_o1.wav",
+    	 "s2": "g14_ambi_o3.wav",
+    	 "s3": "g14_SWF_0.wav",
+    	 "s4": "g14_SWF_1.wav",
+    	 "s5": "",
+    	 "s6": ""
+    	},
+    "g15":
+    	{
+    	 "ref": "g15_ref.wav",
+    	 "anchor":"g15_anchor.wav",
+    	 "s1": "g15_ambi_o1.wav",
+    	 "s2": "g15_ambi_o3.wav",
+    	 "s3": "g15_SWF_0.wav",
+    	 "s4": "g15_SWF_1.wav",
+    	 "s5": "",
+    	 "s6": ""
+    	},
+	}
 }

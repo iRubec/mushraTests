@@ -64,7 +64,8 @@ public:
         if (arraySliders.getUnchecked(sliderPositions[noteNumber])->isEnabled())
         {
             arraySliders.getUnchecked(sliderPositions[noteNumber])->setValue(round(velocity * div));
-            circleWidth = round(velocity * 1.0236);
+            //circleWidth = round(velocity * 1.0236);
+            circleWidth = round(velocity * 0.976923);
             repaint();
         };
     };
@@ -107,7 +108,7 @@ private:
    
     // Textos!
     std::string perceptions[5] = {"Excelente", "Bueno", "Igual", "Pobre", "Malo"};
-    std::string perceptionsWidth[5] = { "Big", "", "", "", "Ref"};
+    std::string perceptionsWidth[5] = { "XL", "L", "M", "S", "XS"};
     std::string buttonText[8] = { "1", "2", "3", "4", "5", "6", "7", "8" };
     std::string names[8] = { "ref", "anch", "s1", "s2", "s3", "s4", "s5", "s6" };
     std::string descriptionText = "Esta es la primera linea de la descripcion del test.\n\
@@ -130,7 +131,7 @@ Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que se
     juce::XmlElement* testData = new juce::XmlElement("testData");
     
     // String matrix to save the files paths 
-    juce::String files[8][8];
+    juce::String files[15][8];
 
     // Audio components
     juce::AudioDeviceSelectorComponent audioSetupComp;
