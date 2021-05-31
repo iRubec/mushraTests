@@ -1,6 +1,6 @@
 {
   "Desc": "This is your MUSHRA test!",
-  "Channels": 2,
+  "Channels": 24,
   "WidthTest": 10,
   "Groups": 15,
   "StimuliPerGroup": 6,
@@ -96,7 +96,7 @@
     	 "s5": "",
     	 "s6": ""
     	},
-	"g9":
+    "g9":
     	{
     	 "ref": "g9_ref.wav",
     	 "anchor":"g9_anchor.wav",
@@ -140,7 +140,7 @@
     	 "s5": "",
     	 "s6": ""
     	},
-	"g13":
+    "g13":
     	{
     	 "ref": "g13_ref.wav",
     	 "anchor":"g13_anchor.wav",
@@ -173,5 +173,5 @@
     	 "s5": "",
     	 "s6": ""
     	},
-	}
+  }
 }

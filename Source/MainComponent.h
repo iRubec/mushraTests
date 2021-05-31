@@ -14,6 +14,7 @@
 */
 class MainComponent : public juce::AudioAppComponent,
                       public juce::Button::Listener,
+                      public juce::Slider::Listener,
                       private juce::MidiKeyboardStateListener,
                       private juce::MidiInputCallback,
                       private juce::Timer
@@ -34,6 +35,7 @@ public:
 
     //==============================================================================
     void buttonClicked(juce::Button* button) override;
+    void sliderValueChanged(juce::Slider* slider) override;
     void timerCallback() override;
     //==============================================================================
     
@@ -66,13 +68,12 @@ public:
             arraySliders.getUnchecked(sliderPositions[noteNumber])->setValue(round(velocity * div));
             //circleWidth = round(velocity * 1.0236);
             circleWidth = round(velocity * 0.976923);
-            repaint();
         };
     };
 
     void midiButton(float noteNumber)
     {
-        if(noteNumber <= 24)
+        if(noteNumber <= 21 || noteNumber == 24)
             arrayButtons[buttonPositions[noteNumber]]->triggerClick();
         else if (noteNumber == 27)
             refBut.triggerClick();
@@ -80,6 +81,8 @@ public:
             stopBut.triggerClick();
         else if (noteNumber == 25)
             nextBut.triggerClick();
+        else if (noteNumber == 22 && testNumber + 1 >= widthTest)
+            anchorBut.triggerClick();
     };
     
     //==============================================================================
@@ -97,6 +100,7 @@ private:
     juce::TextEditor impresions;
     int textForWidth = 0, circleWidth = 0.0;
     bool showMenu = true, paintCircles = false;
+    bool canPass[8] = { false };
 
     juce::String midiText = "MIDI not found";
     juce::String testText = "Test 1";
@@ -108,22 +112,27 @@ private:
    
     // Textos!
     std::string perceptions[5] = {"Excelente", "Bueno", "Igual", "Pobre", "Malo"};
-    std::string perceptionsWidth[5] = { "XL", "L", "M", "S", "XS"};
+    std::string perceptionsWidth[5] = { "Extra Large", "Large", "Medium", "Small", "Extra Small"};
     std::string buttonText[8] = { "1", "2", "3", "4", "5", "6", "7", "8" };
     std::string names[8] = { "ref", "anch", "s1", "s2", "s3", "s4", "s5", "s6" };
-    std::string descriptionText = "Esta es la primera linea de la descripcion del test.\n\
-Ahora va la segunda, que es lo que ha pedido Ricardo y yo soy un mandado.\n\
- 1. Excelente: \n\
- 2. Bueno: \n\
- 3. Igual: \n\
- 4. Peor: \n\
- 5. Terrible: \n\
-Finalmente tenemos una linea que es la ultima. A ver si le gusta al jefe, que seguro que alguna pega le saca";
-    std::string descriptionTextWidth = "Descripcion del test para la anchura";
+    int random[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+    
+    std::string descriptionText = "Califica, siguiendo las siguientes pautas, los diferentes estimulos en una escala de 0 a 100 comparandolos con el sonido de referencia (REF).\n\n\
+ 81-100 Excellent: no percibo diferencia alguna en su posicion\n\
+ 61-80 Good: ligero cambio en la posicion del estimulos\n\
+ 41-60 Fair: el estimulo se desvia de su posicion de referencia\n\
+ 21-40 Poor: el estimulo sufre un desvio sustancial y/o hay dificultad para localizarlo\n\
+ 0-20 Bad: el estimulo esta completamente fuera de su posicion de referencia y/o imposibilidad de localizarlo\n\n\
+Puedes alternar la escucha entre los estimulos y la referencia tantas veces como veas necesario. Pulsando STOP pararas la reproduccion y con > pasaras al siguiente test";
+    
+    std::string descriptionTextWidth = "Califica la anchura de los diferentes estimulos en una escala de 0 a 100, siendo XS el estimulo menos ancho (0) y XL el mas ancho posible (100).\n\n\
+En este caso, XS y XL son las referencias a seguir \n\n\
+Puedes alternar la escucha entre los estimulos y las referencias tantas veces como veas necesario. Pulsando STOP pararas la reproduccion y con > pasaras al siguiente test";
+    
     std::string welcome = "Hola!";
     std::string welcomeText = "Vas a hacer un test mushra";
+    std::string secondTestText = "Comienzo del test de anchura de fuente. Ahora, tendras que fijarte en la anchura que tenga cada estimulo";
     std::string goodBye = "MUCHAS GRACIAS!";
-    int random[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
 
     juce::Image upnaImage, upfImage, jaulabImage;
  

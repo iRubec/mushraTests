@@ -18,7 +18,7 @@ MainComponent::MainComponent()
     centreWithSize(r.getWidth() - 500 + marginX, r.getHeight()- marginY);
 
     // Alert window with the welcome message
-    alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, welcome, welcomeText, "Adelante!");
+    //alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, welcome, welcomeText, "Adelante!");
 
     // Reading the info of the test to do
     readJSON();
@@ -43,6 +43,7 @@ MainComponent::MainComponent()
         s->setRange(0, 100);
         s->setNumDecimalPlacesToDisplay(0);
         s->setEnabled(false);
+        s->addListener(this);
         if (i < stimuli) { s->setAlpha(0.6f); }
         else { s->setAlpha(0.3f); };
         arraySliders.add(s);
@@ -89,6 +90,7 @@ MainComponent::MainComponent()
     // Next button
     nextBut.setButtonText(">");
     nextBut.setName("next");
+    nextBut.setEnabled(false);
     nextBut.addListener(this);
     addAndMakeVisible(nextBut);
     
@@ -111,7 +113,8 @@ MainComponent::MainComponent()
     menuBut.onClick = [this] {
         menuBut.setToggleState(!menuBut.getToggleState(), juce::NotificationType::dontSendNotification);
         showMenu = menuBut.getToggleState(); 
-        repaint(); };
+        repaint(); 
+        isPlaying = !menuBut.getToggleState();};
     addAndMakeVisible(menuBut);
 
     // For width tests
@@ -266,7 +269,7 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
 
     bufferToFill.clearActiveBufferRegion();
 
-    if (isPlaying && ch)
+    if (isPlaying)
     {
         auto outputSamplesOffset = bufferToFill.startSample;
         auto outputSamplesRemaining = bufferToFill.numSamples;
@@ -318,10 +321,10 @@ void MainComponent::paint (juce::Graphics& g)
     g.setColour(juce::Colours::grey);
     g.fillRect(textBounds);
     g.setColour(juce::Colours::white);
-    g.setFont(18.0f);
-    g.drawMultiLineText(paintCircles ? descriptionTextWidth : descriptionText, 15, 60, w - 110, juce::Justification::centredLeft);
+    paintCircles ? g.setFont(17.0f) : g.setFont(17.5f);
+    g.drawMultiLineText(paintCircles ? descriptionTextWidth : descriptionText, 15, 60, w - 110 - textForWidth, juce::Justification::centredLeft);
 
-    g.setFont(18.0f);
+    g.setFont(17.0f);
     g.setColour(juce::Colours::black);
     for (int i = 0; i < 6; i++)
     {
@@ -458,23 +461,32 @@ void MainComponent::buttonClicked(juce::Button* button)
     }
     
     if(buffer == 0 && isPlaying)
-    {
         refBut.setColour(0x1000100, juce::Colours::lightgreen);
-    }
 
     if (buffer == 9 && isPlaying)
-    {
         anchorBut.setColour(0x1000100, juce::Colours::lightgreen);
-    }
 
     repaint();
 };
+
+void MainComponent::sliderValueChanged(juce::Slider* slider)
+{
+    canPass[buffer - 1] = true;
+
+    if (std::find(canPass, canPass + stimuli, false) == canPass + stimuli)
+        nextBut.setEnabled(true);
+    
+    if (testNumber + 1 >= widthTest)
+        repaint();
+}
 
 void MainComponent::handleTests()
 {
     isPlaying = false;
     dataExport();
     testNumber = testNumber + 1;
+    std::fill(std::begin(canPass), std::end(canPass), false);
+    nextBut.setEnabled(false);
 
     // Randomization
     for (int i = 0; i < stimuli; i++) {
@@ -519,7 +531,7 @@ void MainComponent::handleTests()
 
     if (testNumber+1 == widthTest)
     {
-        alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "Cambio de test", "Comienzo del segundo test", "Continuar");
+        alert->showMessageBox(juce::AlertWindow::AlertIconType::InfoIcon, "Cambio de test", secondTestText, "Continuar");
         textForWidth = 200;
         paintCircles = true;
         anchorBut.setVisible(true);
